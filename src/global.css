@@ -1,0 +1,16 @@
+
+
+/* Apply fonts globally */
+@layer base {
+  body {
+    font-family: 'Roboto', sans-serif;
+  }
+
+  .font-bebas {
+    font-family: 'Bebas Neue', cursive;
+  }
+
+  .font-roboto {
+    font-family: 'Roboto', sans-serif;
+  }
+}
