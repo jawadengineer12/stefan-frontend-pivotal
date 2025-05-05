@@ -178,12 +178,13 @@ const Questionnaire = () => {
                           <span className="text-green-600">+3</span>
                         </div>
 
+                        {/* ✅ Always show both rating texts */}
                         <div className="flex justify-between text-xs text-black mt-1 min-h-[1rem]">
                           <span className="text-left text-[11px] text-red-600 w-1/2">
-                            {(question.rating <= 0 && question.rating_neg3_text?.trim()) ? question.rating_neg3_text : ""}
+                            {question.rating_neg3_text?.trim()}
                           </span>
                           <span className="text-right text-[11px] text-green-600 w-1/2">
-                            {(question.rating >= 0 && question.rating_3_text?.trim()) ? question.rating_3_text : ""}
+                            {question.rating_3_text?.trim()}
                           </span>
                         </div>
                       </div>
