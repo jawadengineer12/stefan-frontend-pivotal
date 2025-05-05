@@ -100,7 +100,7 @@ export default function SignIn() {
           </button>
         </div>
 
-        <div className="flex justify-between items-center mb-6">
+        {/* <div className="flex justify-between items-center mb-6">
           <label className="flex items-center text-sm text-gray-700 cursor-pointer">
             <input
               type="checkbox"
@@ -113,7 +113,7 @@ export default function SignIn() {
           <Link to="/forgot" className="text-sm text-gray-700 hover:underline cursor-pointer">
             Forget Password?
           </Link>
-        </div>
+        </div> */}
 
         <button
           type="submit" 
