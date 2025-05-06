@@ -157,9 +157,9 @@ const GetQuestions = () => {
                 Section {section.label}: {section.title}
               </h3>
               <div>
-                <button className="text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded mr-3 cursor-pointer">
+                {/* <button className="text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded mr-3 cursor-pointer">
                   Avg Rating: {section.avg_rating ?? "N/A"}
-                </button>
+                </button> */}
                 <button className="text-blue-600 font-bold text-xl cursor-pointer">
                   {expandedSection === section.label ? "−" : "+"}
                 </button>
