@@ -4,12 +4,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/header";
 import Intro from "./components/Intro";
 import KeyFeature from "./components/KeyFeature";
-//import Questions from "./components/questionnaire";
 import HowItWorks from "./components/howItwork";
 import CallToAction from "./components/callToAction";
 import Footer from "./components/Footer";
 import Questionnaire from "./components/questionnaire";
-
 
 import SignUp from "./pages/signin/SignUp";
 import Login from "./pages/signin/login";
@@ -32,7 +30,6 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
 
-        
         <Route
           path="/home"
           element={
@@ -48,7 +45,8 @@ const App = () => {
             </>
           }
         />
-<Route path="/questionnaire" element={<Questionnaire />} />
+
+        <Route path="/questionnaire" element={<Questionnaire />} />
 
         {/* Auth Routes */}
         <Route path="/signup" element={<SignUp />} />
@@ -58,7 +56,6 @@ const App = () => {
         <Route path="/resetsuccess" element={<ResetSuccessfully />} />
         <Route path="/otpverification" element={<OTPVerification />} />
         <Route path="/admin-login" element={<AdminLogin />} />
-
 
         {/* Admin Dashboard */}
         <Route path="/admin/dashboard" element={<AdminDashboard />}>
