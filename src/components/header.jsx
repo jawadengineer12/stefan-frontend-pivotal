@@ -40,7 +40,7 @@ const Header = () => {
           <a href="#how-it-works" className="hover:text-blue-500 cursor-pointer">
             How It Works
           </a>
-          <a href="#QuestionAire" className="hover:text-blue-500 cursor-pointer">
+          <a href="#call-to-action" className="hover:text-blue-500 cursor-pointer">
             Questionnaire
           </a>
         </nav>
@@ -85,7 +85,7 @@ const Header = () => {
           <a href="#how-it-works" className="block cursor-pointer">
             How It Works
           </a>
-          <a href="#QuestionAire" className="block cursor-pointer">
+          <a href="#call-to-action" className="block cursor-pointer">
             Questionnaire
           </a>
           {isLoggedIn ? (
