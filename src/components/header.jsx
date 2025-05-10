@@ -31,21 +31,29 @@ const Header = () => {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex space-x-6 items-center text-black text-base lg:text-lg">
-          <a href="#Introduction" className="hover:text-blue-500 cursor-pointer">
+          <a
+            href="#Introduction"
+            className="hover:text-blue-500 cursor-pointer"
+          >
             Introduction
           </a>
           <a href="#KeyFeatures" className="hover:text-blue-500 cursor-pointer">
             Key Features
           </a>
-          <a href="#how-it-works" className="hover:text-blue-500 cursor-pointer">
+          <a
+            href="#how-it-works"
+            className="hover:text-blue-500 cursor-pointer"
+          >
             How It Works
           </a>
-          <a href="#call-to-action" className="hover:text-blue-500 cursor-pointer">
+          <span
+            onClick={() => navigate("/questionnaire")}
+            className="hover:text-blue-500 cursor-pointer"
+          >
             Questionnaire
-          </a>
+          </span>
         </nav>
 
-        {/* Right-aligned Button */}
         <div className="hidden md:flex space-x-2 ml-20">
           {isLoggedIn ? (
             <button
@@ -64,7 +72,6 @@ const Header = () => {
           )}
         </div>
 
-        {/* Mobile Menu Icon */}
         <button
           className="md:hidden text-black focus:outline-none cursor-pointer"
           onClick={toggleMenu}
@@ -85,9 +92,16 @@ const Header = () => {
           <a href="#how-it-works" className="block cursor-pointer">
             How It Works
           </a>
-          <a href="#call-to-action" className="block cursor-pointer">
+          <span
+            onClick={() => {
+              setIsOpen(false);
+              navigate("/questionnaire");
+            }}
+            className="block cursor-pointer"
+          >
             Questionnaire
-          </a>
+          </span>
+
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
