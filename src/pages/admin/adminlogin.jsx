@@ -100,16 +100,16 @@ export default function AdminLogin() {
           )}
         </button>
 
-        <div className="text-center mt-4">
+        {/* <div className="text-center mt-4">
           <p className="text-sm text-gray-600">OR</p>
-          <button
+           <button
             type="button"
             onClick={() => navigate("/login")}
             className="mt-2 text-blue-600 font-semibold hover:underline cursor-pointer"
           >
             Login as User
-          </button>
-        </div>
+          </button> 
+        </div> */}
       </form>
 
       <div className="hidden md:flex w-1/2 items-center justify-center">
