@@ -133,7 +133,7 @@ const GenerateFeedback = () => {
         {report && !loadingReport && (
           <button
             onClick={() => handleDownload("pdf")}
-            className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700"
+            className="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 cursor-pointer"
           >
             Download PDF
           </button>
