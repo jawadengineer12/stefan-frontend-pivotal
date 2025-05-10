@@ -35,22 +35,36 @@ const CreateQuestion = () => {
     setLoading(false);
   };
 
-  const handleAddSection = async () => {
-    if (!newSectionTitle.trim()) return alert("Section title is required");
-    try {
-      setAddingSection(true);
-      await axios.post(`${API_BASE_URL}/admin/create-section/`, {
-        label: "A",
-        title: newSectionTitle,
-        company_id: 1,
-      });
-      setNewSectionTitle("");
-      await fetchSections();
-    } catch (err) {
-      console.error("Error adding section:", err);
+ const handleAddSection = async () => {
+  if (!newSectionTitle.trim()) return alert("Section title is required");
+  try {
+    setAddingSection(true);
+
+    // Dynamically calculate next label
+    const existingLabels = sections.map((sec) => sec.label);
+    let nextLabel = "A";
+    for (let i = 0; i < 26; i++) {
+      const candidate = String.fromCharCode(65 + i); // 65 = 'A'
+      if (!existingLabels.includes(candidate)) {
+        nextLabel = candidate;
+        break;
+      }
     }
-    setAddingSection(false);
-  };
+
+    await axios.post(`${API_BASE_URL}/admin/create-section/`, {
+      label: nextLabel,
+      title: newSectionTitle,
+      company_id: 1,
+    });
+
+    setNewSectionTitle("");
+    await fetchSections();
+  } catch (err) {
+    console.error("Error adding section:", err);
+  }
+  setAddingSection(false);
+};
+
 
   const handleAddQuestion = async () => {
     if (!selectedSectionId || !newQuestion.trim()) return;
