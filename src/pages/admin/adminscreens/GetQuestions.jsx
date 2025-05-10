@@ -8,25 +8,39 @@ const GetQuestions = () => {
   const [expandedSection, setExpandedSection] = useState(null);
   const [expandedQuestion, setExpandedQuestion] = useState(null);
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [companies, setCompanies] = useState([]);
 
-  const fetchData = () => {
+  const fetchCompanies = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/admin/get-companies`);
+      setCompanies(res.data);
+    } catch (err) {
+      console.error("Failed to fetch companies:", err);
+    }
+  };
+
+  const fetchCompanyQuestions = async (companyId) => {
     setLoading(true);
-    axios
-      .get(`${API_BASE_URL}/admin/get-all-questions/`)
-      .then((res) => {
-        setSections(res.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        alert("Failed to load questions");
-        setLoading(false);
-      });
+    try {
+      const res = await axios.get(`${API_BASE_URL}/admin/get-questions-by-company/${companyId}`);
+      setSections(res.data);
+    } catch (err) {
+      console.error("Failed to fetch questions:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchCompanies();
   }, []);
+
+  useEffect(() => {
+    if (selectedCompanyId) {
+      fetchCompanyQuestions(selectedCompanyId);
+    }
+  }, [selectedCompanyId]);
 
   const toggleSection = (label) => {
     setExpandedSection(expandedSection === label ? null : label);
@@ -36,59 +50,61 @@ const GetQuestions = () => {
     setExpandedQuestion(expandedQuestion === id ? null : id);
   };
 
-  const groupedByCompany = () => {
-    const grouped = {};
-    sections.forEach((section) => {
-      const companyId = section.company_id;
-      if (!grouped[companyId]) {
-        grouped[companyId] = {
-          companyId,
-          companyName: section.company_name || "Unknown Company",
-          sections: [],
-        };
+  const handleExport = async () => {
+    setLoading(true);
+    try {
+      let allSections = [];
+
+      if (selectedCompanyId) {
+        const res = await axios.get(`${API_BASE_URL}/admin/get-questions-by-company/${selectedCompanyId}`);
+        allSections = res.data;
+        const company = companies.find(c => c.id === selectedCompanyId);
+        allSections.forEach((s) => (s.company_name = company?.name || "Unknown"));
+      } else {
+        const companyFetches = await Promise.all(
+          companies.map(async (company) => {
+            const res = await axios.get(`${API_BASE_URL}/admin/get-questions-by-company/${company.id}`);
+            return res.data.map((s) => ({ ...s, company_name: company.name }));
+          })
+        );
+        allSections = companyFetches.flat();
       }
-      grouped[companyId].sections.push(section);
-    });
-    return Object.values(grouped);
-  };
 
-  const visibleCompanyData = groupedByCompany().find(
-    (g) => g.companyId == selectedCompanyId
-  );
+      if (!allSections.length) {
+        alert("No data available to export.");
+        return;
+      }
 
-  const handleExport = () => {
-    if (!visibleCompanyData) return;
+      let exportText =
+        "Company Name,Question,Average Rating,Standard Deviation,User Name,User Email,Rating,Answer,Submitted On\n";
 
-    let exportText = "Question,Average Rating,User Name,User Email,Rating,Answer,Submitted On\n";
-    visibleCompanyData.sections.forEach((section) => {
-      section.questions.forEach((q) => {
-        q.answers?.forEach((a) => {
-          exportText += `"${q.question}","${q.avg_rating ?? "N/A"}","${a.user_name ?? "N/A"}","${a.user_email ?? "N/A"}","${a.rating ?? "N/A"}","${a.answer?.replace(/"/g, '""') ?? "No feedback given"}","${a.submitted_at ?? "N/A"}"\n`;
+      allSections.forEach((section) => {
+        section.questions.forEach((q) => {
+          q.answers?.forEach((a) => {
+            exportText += `"${section.company_name}","${q.question}","${q.avg_rating ?? "N/A"}","${q.std_dev ?? "N/A"}","${a.user_name ?? "N/A"}","${a.user_email ?? "N/A"}","${a.rating ?? "N/A"}","${a.answer?.replace(/"/g, '""') ?? "No feedback given"}","${a.submitted_at ?? "N/A"}"\n`;
+          });
         });
       });
-    });
 
-    const blob = new Blob([exportText], { type: "text/csv;charset=utf-8" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "questions_export.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const blob = new Blob([exportText], { type: "text/csv;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "questions_export.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("CSV Export Error:", err);
+      alert("Failed to export CSV.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const companyOptions = groupedByCompany().map((g) => ({
-    value: g.companyId,
-    label: g.companyName,
+  const companyOptions = companies.map((company) => ({
+    value: company.id,
+    label: company.name,
   }));
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen overflow-hidden">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full min-h-screen text-black p-6 mt-16 md:mt-6">
@@ -146,80 +162,80 @@ const GetQuestions = () => {
         </button>
       </div>
 
-      {visibleCompanyData ? (
-        visibleCompanyData.sections.map((section, sIndex) => (
-          <div key={sIndex} className="mb-10 border border-gray-300 rounded-lg shadow-sm">
-            <div
-              className="flex justify-between items-center bg-blue-50 px-4 py-3 cursor-pointer"
-              onClick={() => toggleSection(section.label)}
-            >
-              <h3 className="text-lg font-semibold">
-                Section {section.label}: {section.title}
-              </h3>
-              <div>
-                {/* <button className="text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded mr-3 cursor-pointer">
-                  Avg Rating: {section.avg_rating ?? "N/A"}
-                </button> */}
-                <button className="text-blue-600 font-bold text-xl cursor-pointer">
-                  {expandedSection === section.label ? "−" : "+"}
-                </button>
-              </div>
+      {loading ? (
+        <div className="text-center text-gray-600">Loading questions...</div>
+      ) : sections.map((section, sIndex) => (
+        <div key={sIndex} className="mb-10 border border-gray-300 rounded-lg shadow-sm">
+          <div
+            className="flex justify-between items-center bg-blue-50 px-4 py-3 cursor-pointer"
+            onClick={() => toggleSection(section.label)}
+          >
+            <h3 className="text-lg font-semibold">
+              Section {section.label}: {section.title}
+            </h3>
+            <div>
+              <button className="text-blue-600 font-bold text-xl cursor-pointer">
+                {expandedSection === section.label ? "−" : "+"}
+              </button>
             </div>
-
-            {expandedSection === section.label && (
-              <ul className="px-6 py-4">
-                {(section.questions || []).map((q, qIndex) => (
-                  <li key={qIndex} className="border-b border-gray-200 py-3">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">Q{qIndex + 1}: {q.question}</p>
-                        <p className="text-sm text-gray-600">
-                          Answered by {q.answers?.length || 0} user(s)
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button className="text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded cursor-pointer">
-                          Avg Rating: {q.avg_rating ?? "N/A"}
-                        </button>
-                        <button
-                          onClick={() => toggleAnswers(q.question_id)}
-                          className="bg-blue-600 text-white px-4 py-1 rounded cursor-pointer"
-                        >
-                          {expandedQuestion === q.question_id ? "Hide Answers" : "View Answers"}
-                        </button>
-                      </div>
-                    </div>
-
-                    {expandedQuestion === q.question_id && (
-                      <div className="mt-3 ml-2 space-y-2">
-                        {q.answers?.length > 0 ? (
-                          q.answers.map((a, idx) => (
-                            <div key={idx} className="bg-gray-100 p-3 rounded shadow-sm text-sm">
-                              <p><strong>User Name:</strong> <span className="text-blue-800">{a.user_name || "N/A"}</span></p>
-                              <p><strong>User Email:</strong> <span className="text-blue-600">{a.user_email || "N/A"}</span></p>
-                              <p><strong>Submitted on:</strong> <span className="text-gray-700">{a.submitted_at ? new Date(a.submitted_at).toLocaleString() : "N/A"}</span></p>
-                              <p><strong>Rating:</strong> <span className="text-blue-700">{a.rating ?? "N/A"}</span></p>
-                              <p><strong>Answer:</strong>{" "}
-                                {a.answer?.trim() ? (
-                                  a.answer
-                                ) : (
-                                  <span className="italic text-gray-500">No feedback given</span>
-                                )}
-                              </p>
-                            </div>
-                          ))
-                        ) : (
-                          <p className="italic text-gray-500">No answers available</p>
-                        )}
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
-        ))
-      ) : null}
+
+          {expandedSection === section.label && (
+            <ul className="px-6 py-4">
+              {(section.questions || []).map((q, qIndex) => (
+                <li key={qIndex} className="border-b border-gray-200 py-3">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Q{qIndex + 1}: {q.question}</p>
+                      <p className="text-sm text-gray-600">
+                        Answered by {q.answers?.length || 0} user(s)
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded cursor-pointer">
+                        Avg: {q.avg_rating ?? "N/A"}
+                      </button>
+                      <button className="text-xs font-medium bg-green-100 text-green-800 px-2 py-1 rounded cursor-pointer">
+                        SD: {q.std_dev ?? "N/A"}
+                      </button>
+                      <button
+                        onClick={() => toggleAnswers(q.question_id)}
+                        className="bg-blue-600 text-white px-4 py-1 rounded cursor-pointer"
+                      >
+                        {expandedQuestion === q.question_id ? "Hide Answers" : "View Answers"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {expandedQuestion === q.question_id && (
+                    <div className="mt-3 ml-2 space-y-2">
+                      {q.answers?.length > 0 ? (
+                        q.answers.map((a, idx) => (
+                          <div key={idx} className="bg-gray-100 p-3 rounded shadow-sm text-sm">
+                            <p><strong>User Name:</strong> <span className="text-blue-800">{a.user_name || "N/A"}</span></p>
+                            <p><strong>User Email:</strong> <span className="text-blue-600">{a.user_email || "N/A"}</span></p>
+                            <p><strong>Submitted on:</strong> <span className="text-gray-700">{a.submitted_at ? new Date(a.submitted_at).toLocaleString() : "N/A"}</span></p>
+                            <p><strong>Rating:</strong> <span className="text-blue-700">{a.rating ?? "N/A"}</span></p>
+                            <p><strong>Answer:</strong>{" "}
+                              {a.answer?.trim() ? (
+                                a.answer
+                              ) : (
+                                <span className="italic text-gray-500">No feedback given</span>
+                              )}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="italic text-gray-500">No answers available</p>
+                      )}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
