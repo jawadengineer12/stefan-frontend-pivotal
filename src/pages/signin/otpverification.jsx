@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { resendOtp, verifyOtp } from '../../api/auth.js';
+import { resendOtp, verifyOtp } from '../../api/auth';
 import { useNavigate } from 'react-router-dom';
 import AuthImage from '../../components/authImage/AUTHImage';
 
