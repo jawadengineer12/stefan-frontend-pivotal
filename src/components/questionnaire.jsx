@@ -9,6 +9,7 @@ const Questionnaire = () => {
   const [expandedSection, setExpandedSection] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [summary, setSummary] = useState("");
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -17,21 +18,28 @@ const Questionnaire = () => {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/user/get-question/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
+
+        const { user_email, sections: fetchedSections } = response.data;
+        const storedEmail = localStorage.getItem("questionnaire_owner_email");
+
+        if (storedEmail && storedEmail !== user_email) {
+          localStorage.removeItem("questionnaireData");
+        }
+
+        localStorage.setItem("questionnaire_owner_email", user_email);
 
         const stored = JSON.parse(localStorage.getItem("questionnaireData")) || [];
 
-        const merged = response.data.map((section) => ({
+        const merged = fetchedSections.map((section) => ({
           ...section,
           questions: section.questions.map((q) => {
             const local = stored.find((s) => s.question_id === q.question_id);
             return {
               ...q,
-              rating: local?.rating || 0,
-              feedback: local?.feedback || "",
+              rating: local?.rating ?? q.rating ?? 0,
+              feedback: local?.feedback ?? q.feedback ?? "",
               rating_3_text: q.rating_3_text || "",
               rating_neg3_text: q.rating_neg3_text || "",
             };
@@ -105,14 +113,58 @@ const Questionnaire = () => {
           );
         }
       }
-      localStorage.removeItem("questionnaireData");
+
       setSubmitted(true);
+
+      const companyId = localStorage.getItem("company_id");
+      if (companyId) {
+        const summaryRes = await axios.get(`${API_BASE_URL}/generate-feedback-by-company/${companyId}`);
+        setSummary(summaryRes.data.summary);
+      }
+
     } catch (err) {
       console.error("Error submitting answers:", err);
       alert("Failed to submit answers.");
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const formatSummary = (summary) => {
+    return summary.split("\n").map((line, index) => {
+      const trimmed = line.trim();
+
+      if (trimmed.startsWith("### ")) {
+        return <h3 key={index} className="text-lg font-bold mt-4">{trimmed.replace("### ", "")}</h3>;
+      }
+
+      if (/^\*\*(.+)\*\*:/.test(trimmed)) {
+        const parts = trimmed.split("**").filter(Boolean);
+        return (
+          <p key={index} className="mt-2">
+            <span className="font-semibold">{parts[0]}:</span> {parts.slice(1).join("")}
+          </p>
+        );
+      }
+
+      if (/^\d+\.\s/.test(trimmed)) {
+        return (
+          <p key={index} className="ml-4 mt-2 text-sm">
+            <span className="font-medium">{trimmed}</span>
+          </p>
+        );
+      }
+
+      if (/^-\s/.test(trimmed)) {
+        return (
+          <li key={index} className="ml-8 list-disc text-sm">{trimmed.replace(/^-/, "").trim()}</li>
+        );
+      }
+
+      return (
+        <p key={index} className="text-sm text-gray-800">{trimmed}</p>
+      );
+    });
   };
 
   return (
@@ -164,9 +216,7 @@ const Questionnaire = () => {
                           onChange={(e) => handleRatingChange(sIndex, qIndex, parseInt(e.target.value))}
                           className={`w-full h-2 rounded-lg appearance-none cursor-pointer 
                             ${getSliderThumbColor(question.rating)} bg-gray-300`}
-                          style={{
-                            WebkitAppearance: 'none',
-                          }}
+                          style={{ WebkitAppearance: 'none' }}
                         />
                         <div className="flex justify-between text-xs text-gray-700 mt-1 px-[2px]">
                           <span className="text-red-600">-3</span>
@@ -178,7 +228,6 @@ const Questionnaire = () => {
                           <span className="text-green-600">+3</span>
                         </div>
 
-                        {/* ✅ Always show both rating texts */}
                         <div className="flex justify-between text-xs text-black mt-1 min-h-[1rem]">
                           <span className="text-left text-[11px] text-red-600 w-1/2">
                             {question.rating_neg3_text?.trim()}
@@ -215,6 +264,13 @@ const Questionnaire = () => {
             {submitting ? "Submitting..." : "Submit Feedback"}
           </button>
         </div>
+
+        {summary && (
+          <div className="mt-12 bg-white p-6 rounded shadow">
+            <h3 className="text-xl font-semibold mb-4">AI-Generated Summary</h3>
+            <div className="space-y-2">{formatSummary(summary)}</div>
+          </div>
+        )}
       </div>
     </section>
   );
