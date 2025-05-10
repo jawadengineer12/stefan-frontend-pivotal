@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { resendOtp } from '../../api/auth.js';
+import { resendOtp, verifyOtp } from '../../api/auth.js';
 import { useNavigate } from 'react-router-dom';
+import AuthImage from '../../components/authImage/AUTHImage';
 
 const OTPVerification = () => {
   const [code, setCode] = useState('');
   const [resendMessage, setResendMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const email = localStorage.getItem("resetEmail");
 
   useEffect(() => {
@@ -16,14 +18,24 @@ const OTPVerification = () => {
     }
   }, [email, navigate]);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!code.trim()) {
-      alert("Please enter the OTP code.");
+      setErrorMessage("Please enter the OTP code.");
       return;
     }
 
-    localStorage.setItem("resetOtp", code);
-    navigate("/resetpassword");
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      await verifyOtp({ email, code }); // ✅ server-side verification
+      localStorage.setItem("resetOtp", code);
+      navigate("/resetpassword");
+    } catch (err) {
+      setErrorMessage(err.response?.data?.detail || "Invalid verification code.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResendOtp = async () => {
@@ -32,36 +44,62 @@ const OTPVerification = () => {
       setResendMessage("OTP has been resent to your email.");
       setTimeout(() => setResendMessage(''), 3000);
     } catch (err) {
-      alert(err.response?.data?.detail || "Failed to resend OTP.");
+      setErrorMessage(err.response?.data?.detail || "Failed to resend OTP.");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h2 className="text-2xl font-bold mb-4">Verify OTP</h2>
-      <p className="mb-2">Code sent to: <strong>{email}</strong></p>
-      <input
-        type="text"
-        placeholder="Enter OTP"
-        className="mb-4 border p-2 text-black"
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-      />
-      <button
-        onClick={handleContinue}
-        className="bg-black text-white px-4 py-2 rounded w-[200px] mb-3"
-      >
-        Continue
-      </button>
-      <button
-        onClick={handleResendOtp}
-        className="text-blue-600 underline text-sm"
-      >
-        Resend OTP
-      </button>
-      {resendMessage && (
-        <p className="text-blue-600 text-sm mt-2">{resendMessage}</p>
-      )}
+    <div className="flex flex-col md:flex-row h-screen justify-center items-center overflow-hidden">
+      <div className="w-full md:w-[385px] h-screen flex justify-center items-center px-4">
+        <div className="w-full max-w-md md:ml-20 mx-auto flex flex-col items-center">
+          <h2 className="text-[34px] font-bold mb-6 text-blue-500">Verify OTP</h2>
+          <p className="mb-3 text-sm text-gray-700">Code sent to: <strong>{email}</strong></p>
+
+          <input
+            type="text"
+            placeholder="Enter OTP"
+            className="w-full mb-2 p-3 border rounded-[140px] text-black"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+
+          {errorMessage && (
+            <p className="text-red-600 text-sm mb-2">{errorMessage}</p>
+          )}
+
+          <button
+            onClick={handleContinue}
+            className="w-full bg-blue-500 text-white p-3 rounded-[140px] mb-3 cursor-pointer flex items-center justify-center"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                Verifying...
+              </>
+            ) : (
+              "Continue"
+            )}
+          </button>
+
+          <button
+            onClick={handleResendOtp}
+            className="text-blue-600 underline text-sm cursor-pointer"
+          >
+            Resend OTP
+          </button>
+
+          {resendMessage && (
+            <p className="text-blue-600 text-sm mt-2">{resendMessage}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="hidden lg:flex h-screen w-[75%] justify-end items-center">
+        <div className="h-full w-full">
+          <AuthImage />
+        </div>
+      </div>
     </div>
   );
 };
