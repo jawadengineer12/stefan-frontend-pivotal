@@ -6,10 +6,14 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
 import API_BASE_URL from "../../constants/config";
 
-// ✅ Email validation function
 const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email.toLowerCase());
+  return emailRegex.test(email);
+};
+
+const isStrongPassword = (password) => {
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/;
+  return strongPasswordRegex.test(password);
 };
 
 export default function SignUp() {
@@ -17,7 +21,8 @@ export default function SignUp() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedCompanyId, setSelectedCompanyId] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companySuggestions, setCompanySuggestions] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -44,21 +49,45 @@ export default function SignUp() {
   const handleSignup = async () => {
     if (!name.trim()) return alert("Name is required");
     if (!email.trim()) return alert("Email is required");
-    if (!isValidEmail(email)) return alert("Please enter a valid email address (e.g., example@gmail.com)");
-    if (!selectedCompanyId) return alert("Please select a company");
+    if (!isValidEmail(email)) return alert("Please enter a valid email address");
+    if (!companyName.trim()) return alert("Company name is required");
     if (!password) return alert("Password is required");
+    if (!isStrongPassword(password))
+      return alert(
+        "Password must be at least 12 characters long and include uppercase, lowercase, number, and special character."
+      );
     if (!confirmPassword) return alert("Please confirm your password");
     if (password !== confirmPassword) return alert("Passwords do not match");
 
+    const matchedCompany = companies.find(
+      (c) => c.name === companyName.trim()
+    );
+    if (!matchedCompany) {
+      return alert("Company does not exist. Please choose a valid company.");
+    }
+
     try {
       setSigningUp(true);
-      await signup({ email, password, name, company_id: Number(selectedCompanyId) });
+      await signup({
+        email,
+        password,
+        name,
+        company_id: matchedCompany.id,
+      });
       navigate("/login");
     } catch (err) {
       alert(err.response?.data?.detail || "Signup failed");
     } finally {
       setSigningUp(false);
     }
+  };
+
+  const handleCompanyInput = (value) => {
+    setCompanyName(value);
+    const matches = companies.filter((c) =>
+      c.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setCompanySuggestions(matches.slice(0, 10)); // limit to top 10
   };
 
   if (loading) {
@@ -71,13 +100,11 @@ export default function SignUp() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      
-      {/* ✅ CHANGED THIS DIV to a FORM and added onSubmit handler */}
       <form
         className="w-full md:w-1/2 flex flex-col justify-center px-6 max-w-md mx-auto"
         onSubmit={(e) => {
-          e.preventDefault(); // ✅ Prevent default form submission (page reload)
-          handleSignup(); // ✅ Trigger custom sign-up logic
+          e.preventDefault();
+          handleSignup();
         }}
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-black mb-2">
@@ -107,20 +134,31 @@ export default function SignUp() {
           required
         />
 
-        <label className="text-sm font-medium text-gray-700 mb-1 cursor-pointer">Select Company</label>
-        <select
-          value={selectedCompanyId}
-          onChange={(e) => setSelectedCompanyId(e.target.value)}
-          className="w-full mb-4 p-3 border border-gray-300 rounded-md text-black cursor-pointer"
+        <label className="text-sm font-medium text-gray-700 mb-1">Enter Company Name</label>
+        <input
+          type="text"
+          value={companyName}
+          onChange={(e) => handleCompanyInput(e.target.value)}
+          placeholder="Type company name"
+          className="w-full mb-1 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500"
           required
-        >
-          <option value="">-- Select Company --</option>
-          {companies.map((company) => (
-            <option key={company.id} value={company.id}>
-              {company.name}
-            </option>
-          ))}
-        </select>
+        />
+        {companyName.trim() !== "" && companySuggestions.length > 0 && (
+          <ul className="border border-gray-300 rounded-md mb-4 bg-white shadow-sm">
+            {companySuggestions.map((c) => (
+              <li
+                key={c.id}
+                onClick={() => {
+                  setCompanyName(c.name);
+                  setCompanySuggestions([]);
+                }}
+                className="px-4 py-2 text-sm text-black hover:bg-gray-100 cursor-pointer"
+              >
+                {c.name}
+              </li>
+            ))}
+          </ul>
+        )}
 
         <label className="text-sm font-medium text-gray-700 mb-1">Password</label>
         <div className="relative mb-4">
@@ -161,7 +199,7 @@ export default function SignUp() {
         </div>
 
         <button
-          type="submit" 
+          type="submit"
           className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition cursor-pointer"
           disabled={signingUp}
         >
