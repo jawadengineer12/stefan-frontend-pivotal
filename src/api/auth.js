@@ -11,10 +11,14 @@ export const login = (data) =>
   axios.post(`${API_BASE_URL}/user/login`, data);
 
 
-export const forgotPassword = (email) =>
-  axios.post(`${API_BASE_URL}/user/forgot-password`, JSON.stringify(email), {
-    headers: { "Content-Type": "application/json" }
-  });
+
+export const forgotPassword = (data) => {
+  return axios.post(`${API_BASE_URL}/user/forgot-password`, data); 
+};
+
+export const verifyOtp = (data) => {
+  return axios.post(`${API_BASE_URL}/user/verify-otp`, data);
+};
 
 
 export const resendOtp = (email) =>
