@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import API_BASE_URL from "../../../constants/config";
+import Select from "react-select";
 
 const CompanyManagement = () => {
   const [companies, setCompanies] = useState([]);
@@ -9,7 +10,7 @@ const CompanyManagement = () => {
   const [editCompanyName, setEditCompanyName] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(null); // companyId being deleted
+  const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
     fetchCompanies();
@@ -48,7 +49,10 @@ const CompanyManagement = () => {
     if (!window.confirm("Delete this company?")) return;
     try {
       setDeleting(id);
-      await axios.delete(`${API_BASE_URL}/admin/delete-company/${id}`);
+      await axios.delete(`${API_BASE_URL}/admin/delete-company/${id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      alert("Company deleted successfully");
       fetchCompanies();
     } catch (err) {
       console.error(err);
