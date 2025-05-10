@@ -16,7 +16,7 @@ export default function SignIn() {
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
     if (savedEmail) {
-      setEmail(savedEmail);
+      setEmail(savedEmail); // Preserved case
       setRemember(true);
     }
   }, []);
@@ -25,11 +25,11 @@ export default function SignIn() {
     setLoading(true);
     setError("");
     try {
-      const res = await login({ email, password });
+      const res = await login({ email, password }); // Case-sensitive email
       localStorage.setItem("token", res.data.access_token);
 
       if (remember) {
-        localStorage.setItem("rememberedEmail", email);
+        localStorage.setItem("rememberedEmail", email); // Case preserved
       } else {
         localStorage.removeItem("rememberedEmail");
       }
@@ -51,13 +51,11 @@ export default function SignIn() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      
-      
       <form
         className="w-full md:w-1/2 flex flex-col justify-center px-6 max-w-md mx-auto"
         onSubmit={(e) => {
-          e.preventDefault(); 
-          handleLogin(); 
+          e.preventDefault();
+          handleLogin();
         }}
       >
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-black mb-2">
@@ -100,7 +98,7 @@ export default function SignIn() {
           </button>
         </div>
 
-        {/* <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6">
           <label className="flex items-center text-sm text-gray-700 cursor-pointer">
             <input
               type="checkbox"
@@ -113,10 +111,10 @@ export default function SignIn() {
           <Link to="/forgot" className="text-sm text-gray-700 hover:underline cursor-pointer">
             Forget Password?
           </Link>
-        </div> */}
+        </div>
 
         <button
-          type="submit" 
+          type="submit"
           className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition cursor-pointer"
           disabled={loading}
         >
@@ -142,17 +140,6 @@ export default function SignIn() {
             Create Account
           </Link>
         </p>
-
-        <div className="text-center mt-4">
-          <p className="text-sm text-gray-600">OR</p>
-          <button
-            type="button"
-            onClick={() => navigate("/admin-login")}
-            className="mt-2 text-blue-600 font-semibold hover:underline cursor-pointer"
-          >
-            Login as Admin
-          </button>
-        </div>
       </form>
 
       <div className="hidden md:flex w-1/2 items-center justify-center h-screen">
