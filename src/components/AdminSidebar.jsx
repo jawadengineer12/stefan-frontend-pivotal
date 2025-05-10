@@ -45,13 +45,7 @@ const AdminSidebar = ({ sidebarVisible, setSidebarVisible }) => {
                 onClick={() => handleNavClick("/admin/dashboard/create-question")}
                 className="text-left hover:bg-blue-600 px-4 py-2 rounded cursor-pointer"
               >
-                Configure
-              </button>
-              <button
-                onClick={() => handleNavClick("/admin/dashboard/get-questions")}
-                className="text-left hover:bg-blue-600 px-4 py-2 rounded cursor-pointer"
-              >
-                See all Responses
+                Configure Questions
               </button>
               <button
                 onClick={() => handleNavClick("/admin/dashboard/company")}
@@ -59,6 +53,13 @@ const AdminSidebar = ({ sidebarVisible, setSidebarVisible }) => {
               >
                 Manage Company
               </button>
+              <button
+                onClick={() => handleNavClick("/admin/dashboard/get-questions")}
+                className="text-left hover:bg-blue-600 px-4 py-2 rounded cursor-pointer"
+              >
+                See all Responses
+              </button>
+
               <button
                 onClick={() => handleNavClick("/admin/dashboard/feedback")}
                 className="text-left hover:bg-blue-600 px-4 py-2 rounded cursor-pointer"
