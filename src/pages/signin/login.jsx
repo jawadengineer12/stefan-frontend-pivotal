@@ -16,7 +16,7 @@ export default function SignIn() {
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
     if (savedEmail) {
-      setEmail(savedEmail); // Preserved case
+      setEmail(savedEmail);
       setRemember(true);
     }
   }, []);
@@ -24,12 +24,13 @@ export default function SignIn() {
   const handleLogin = async () => {
     setLoading(true);
     setError("");
+
     try {
-      const res = await login({ email, password }); // Case-sensitive email
+      const res = await login({ email, password });
       localStorage.setItem("token", res.data.access_token);
 
       if (remember) {
-        localStorage.setItem("rememberedEmail", email); // Case preserved
+        localStorage.setItem("rememberedEmail", email);
       } else {
         localStorage.removeItem("rememberedEmail");
       }
@@ -80,7 +81,9 @@ export default function SignIn() {
           className="w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500"
         />
 
-        <label className="text-sm font-medium text-gray-700 mb-1">Password</label>
+        <label className="text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
         <div className="relative mb-2">
           <input
             type={showPassword ? "text" : "password"}
@@ -99,17 +102,32 @@ export default function SignIn() {
         </div>
 
         <div className="flex justify-between items-center mb-6">
-          <label className="flex items-center text-sm text-gray-700 cursor-pointer">
+          <label className="flex items-center text-sm text-gray-700 cursor-pointer relative">
             <input
               type="checkbox"
-              className="mr-2 cursor-pointer"
               checked={remember}
               onChange={() => setRemember(!remember)}
+              className="peer w-4 h-4 mr-2 appearance-none border border-gray-500 rounded-sm bg-white checked:bg-gray-400 checked:border-gray-500 cursor-pointer"
             />
-            Remember password
+
+            <svg
+              className="absolute left-[2px] top-[2px] w-3 h-3 text-white pointer-events-none hidden peer-checked:block"
+              fill="none"
+              viewBox="0 0 23 23"
+              stroke="currentColor"
+              strokeWidth="4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            <span className="text-gray-800">Remember password</span>
           </label>
-          <Link to="/forgot" className="text-sm text-gray-700 hover:underline cursor-pointer">
-            Forget Password?
+
+          <Link to="/forgot" className="text-sm text-gray-700 hover:underline">
+            Forgot Password?
           </Link>
         </div>
 
@@ -136,7 +154,10 @@ export default function SignIn() {
 
         <p className="text-center text-sm text-gray-600">
           Do not have an account?{" "}
-          <Link to="/signup" className="text-blue-600 font-semibold hover:underline cursor-pointer">
+          <Link
+            to="/signup"
+            className="text-blue-600 font-semibold hover:underline"
+          >
             Create Account
           </Link>
         </p>
