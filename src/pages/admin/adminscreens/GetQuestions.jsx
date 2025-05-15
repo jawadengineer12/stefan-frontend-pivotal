@@ -5,7 +5,7 @@ import Select from "react-select";
 
 const GetQuestions = () => {
   const [sections, setSections] = useState([]);
-  const [expandedSection, setExpandedSection] = useState(null);
+  const [expandedAll, setExpandedAll] = useState(false); // updated logic
   const [expandedQuestion, setExpandedQuestion] = useState(null);
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -42,9 +42,10 @@ const GetQuestions = () => {
     }
   }, [selectedCompanyId]);
 
-  const toggleSection = (label) => {
-    setExpandedSection(expandedSection === label ? null : label);
-  };
+ const toggleSection = () => {
+  setExpandedAll((prev) => !prev);
+};
+
 
   const toggleAnswers = (id) => {
     setExpandedQuestion(expandedQuestion === id ? null : id);
@@ -116,7 +117,10 @@ const GetQuestions = () => {
         <div className="w-full md:w-1/3 z-0 md:z-40">
           <Select
             value={companyOptions.find((opt) => opt.value === selectedCompanyId)}
-            onChange={(selected) => setSelectedCompanyId(selected.value)}
+            onChange={(selected) => {
+              setExpandedAll(false);
+              setSelectedCompanyId(selected.value);
+            }}
             options={companyOptions}
             placeholder="-- Select Company --"
             className="text-black"
@@ -168,19 +172,19 @@ const GetQuestions = () => {
         <div key={sIndex} className="mb-10 border border-gray-300 rounded-lg shadow-sm">
           <div
             className="flex justify-between items-center bg-blue-50 px-4 py-3 cursor-pointer"
-            onClick={() => toggleSection(section.label)}
+            onClick={toggleSection}
           >
             <h3 className="text-lg font-semibold">
               Section {section.label}: {section.title}
             </h3>
             <div>
               <button className="text-blue-600 font-bold text-xl cursor-pointer">
-                {expandedSection === section.label ? "−" : "+"}
+                {expandedAll ? "−" : "+"}
               </button>
             </div>
           </div>
 
-          {expandedSection === section.label && (
+          {expandedAll && (
             <ul className="px-6 py-4">
               {(section.questions || []).map((q, qIndex) => (
                 <li key={qIndex} className="border-b border-gray-200 py-3">
