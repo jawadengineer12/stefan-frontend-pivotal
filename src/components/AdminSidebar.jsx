@@ -41,18 +41,19 @@ const AdminSidebar = ({ sidebarVisible, setSidebarVisible }) => {
           <>
             <div className="flex flex-col space-y-4 mt-8">
               <h1 className="text-xl font-bold">Admin Dashboard</h1>
+               <button
+                onClick={() => handleNavClick("/admin/dashboard/company")}
+                className="text-left hover:bg-blue-600 px-4 py-2 rounded cursor-pointer"
+              >
+                Manage Companies
+              </button>
               <button
                 onClick={() => handleNavClick("/admin/dashboard/create-question")}
                 className="text-left hover:bg-blue-600 px-4 py-2 rounded cursor-pointer"
               >
-                Configure Questions
+                Configure Sections / Questions
               </button>
-              <button
-                onClick={() => handleNavClick("/admin/dashboard/company")}
-                className="text-left hover:bg-blue-600 px-4 py-2 rounded cursor-pointer"
-              >
-                Manage Company
-              </button>
+             
               <button
                 onClick={() => handleNavClick("/admin/dashboard/get-questions")}
                 className="text-left hover:bg-blue-600 px-4 py-2 rounded cursor-pointer"
