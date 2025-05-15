@@ -143,7 +143,7 @@ const CreateQuestion = () => {
 
   return (
     <div className="py-10 px-4 max-w-5xl mx-auto w-full">
-      <h2 className="text-2xl font-bold mb-6 text-center md:text-left">Manage Global Questions</h2>
+      <h2 className="text-xl font-bold mb-3 text-center md:text-left">Add Section</h2>
 
       <input
         placeholder="New Section Title"
@@ -158,7 +158,7 @@ const CreateQuestion = () => {
       >
         {addingSection ? "🔄 Adding..." : "+ Add Section"}
       </button>
-
+      <p className="text-xl font-bold mb-3 text-center md:text-left text-black">Add Questions</p>
       <select
         value={selectedSectionId}
         onChange={(e) => setSelectedSectionId(e.target.value)}
@@ -197,6 +197,7 @@ const CreateQuestion = () => {
       >
         {addingQuestion ? "🔄 Adding..." : "+ Add Question"}
       </button>
+      <p className="text-xl font-bold mt-4 text-center md:text-left text-black">Modify Questions</p>
 
       {sections.map((section) => (
         <div key={section.section_id} className="mt-8 border rounded p-4 bg-gray-100">
