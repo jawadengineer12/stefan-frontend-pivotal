@@ -134,7 +134,7 @@ export default function SignUp() {
           required
         />
 
-        <label className="text-sm font-medium text-gray-700 mb-1">Enter Company Name</label>
+        <label className="text-sm font-medium text-gray-700 mb-1">Enter Company ID</label>
         <input
           type="text"
           value={companyName}
@@ -197,6 +197,10 @@ export default function SignUp() {
             {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
           </button>
         </div>
+        <p className="text-xs text-gray-500 mb-3 mt-[-17px]">
+  Password must be at least 12 characters long and include uppercase, lowercase, number, and special character.
+        </p>
+
 
         <button
           type="submit"
