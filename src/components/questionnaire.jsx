@@ -170,7 +170,9 @@ const Questionnaire = () => {
   return (
     <section className="py-20 px-6 flex flex-col bg-gray-200 min-h-screen">
       <div className="container mx-auto max-w-4xl">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Product Related Questions</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Questions</h2>
+        <p className="text-gray-600 text-center mb-8">Your ratings and answers are saved step by step. You can always return to the answers and adjust them later. 
+</p>
 
         {submitted && (
           <div className="text-center bg-white p-10 rounded shadow mb-8">
