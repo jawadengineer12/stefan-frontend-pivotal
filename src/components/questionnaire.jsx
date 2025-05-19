@@ -32,19 +32,30 @@ const Questionnaire = () => {
 
         const stored = JSON.parse(localStorage.getItem("questionnaireData")) || [];
 
-        const merged = fetchedSections.map((section) => ({
-          ...section,
-          questions: section.questions.map((q) => {
-            const local = stored.find((s) => s.question_id === q.question_id);
-            return {
-              ...q,
-              rating: local?.rating ?? q.rating ?? 0,
-              feedback: local?.feedback ?? q.feedback ?? "",
-              rating_3_text: q.rating_3_text || "",
-              rating_neg3_text: q.rating_neg3_text || "",
-            };
-          }),
-        }));
+   const merged = fetchedSections
+  .sort((a, b) => a.label.localeCompare(b.label)) // Sort sections alphabetically
+  .map((section) => ({
+    ...section,
+    questions: section.questions
+      .map((q) => {
+        const local = stored.find((s) => s.question_id === q.question_id);
+        return {
+          ...q,
+          rating: local?.rating ?? q.rating ?? 0,
+          feedback: local?.feedback ?? q.feedback ?? "",
+          cantAnswer: local?.cantAnswer ?? false,
+          rating_3_text: q.rating_3_text || "",
+          rating_neg3_text: q.rating_neg3_text || "",
+        };
+      })
+      .sort((a, b) => {
+        // Extract numeric part from question like "L1", "L2", etc.
+        const numA = parseInt(a.question.match(/\d+/)?.[0] || 0);
+        const numB = parseInt(b.question.match(/\d+/)?.[0] || 0);
+        return numA - numB;
+      }),
+  }));
+
 
         setSections(merged);
       } catch (err) {
@@ -61,6 +72,7 @@ const Questionnaire = () => {
         question_id: q.question_id,
         rating: q.rating,
         feedback: q.feedback,
+        cantAnswer: q.cantAnswer,
       }))
     );
     localStorage.setItem("questionnaireData", JSON.stringify(allAnswers));
@@ -76,6 +88,20 @@ const Questionnaire = () => {
   const handleFeedbackChange = (sIndex, qIndex, value) => {
     const updated = [...sections];
     updated[sIndex].questions[qIndex].feedback = value;
+    setSections(updated);
+    autoSave(updated);
+  };
+
+  const handleCantAnswerToggle = (sIndex, qIndex) => {
+    const updated = [...sections];
+    const question = updated[sIndex].questions[qIndex];
+    question.cantAnswer = !question.cantAnswer;
+
+    if (question.cantAnswer) {
+      question.rating = 0;
+      question.feedback = "";
+    }
+
     setSections(updated);
     autoSave(updated);
   };
@@ -102,6 +128,7 @@ const Questionnaire = () => {
             {
               answer: q.feedback,
               rating: q.rating,
+              cant_answer: q.cantAnswer,
               submitted_at: new Date().toISOString(),
             },
             {
@@ -171,8 +198,7 @@ const Questionnaire = () => {
     <section className="py-20 px-6 flex flex-col bg-gray-200 min-h-screen">
       <div className="container mx-auto max-w-4xl">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Questions</h2>
-        <p className="text-gray-600 text-center mb-8">Your ratings and answers are saved step by step. You can always return to the answers and adjust them later. 
-</p>
+        <p className="text-gray-600 text-center mb-8">Your ratings and answers are saved step by step. You can always return to the answers and adjust them later.</p>
 
         {submitted && (
           <div className="text-center bg-white p-10 rounded shadow mb-8">
@@ -208,6 +234,26 @@ const Questionnaire = () => {
                     <div key={question.question_id} className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
                       <p className="text-lg font-medium text-gray-800 mb-4">{question.question}</p>
 
+                      <div className="mb-4">
+<label className="text-sm text-gray-800 flex items-center gap-2 mb-2 cursor-pointer">
+  <div className="relative">
+    <input
+      type="checkbox"
+      checked={question.cantAnswer}
+      onChange={() => handleCantAnswerToggle(sIndex, qIndex)}
+      className="peer appearance-none h-4 w-4 border border-gray-400 rounded bg-transparent cursor-pointer checked:bg-transparent"
+    />
+    {/* Tick ✔ shown only when checked */}
+    <span className="absolute top-0 left-0 h-4 w-4 flex items-center justify-center text-xs font-bold text-black peer-checked:opacity-100 opacity-0 pointer-events-none">
+      ✔
+    </span>
+  </div>
+  I can’t answer this question
+</label>
+
+
+                      </div>
+
                       <div className="mb-6">
                         <input
                           type="range"
@@ -215,9 +261,9 @@ const Questionnaire = () => {
                           max="3"
                           step="1"
                           value={question.rating}
+                          disabled={question.cantAnswer}
                           onChange={(e) => handleRatingChange(sIndex, qIndex, parseInt(e.target.value))}
-                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer 
-                            ${getSliderThumbColor(question.rating)} bg-gray-300`}
+                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${getSliderThumbColor(question.rating)} bg-gray-300`}
                           style={{ WebkitAppearance: 'none' }}
                         />
                         <div className="flex justify-between text-xs text-gray-700 mt-1 px-[2px]">
@@ -243,6 +289,7 @@ const Questionnaire = () => {
                       <textarea
                         placeholder="Please explain your rating..."
                         value={question.feedback}
+                        disabled={question.cantAnswer}
                         onChange={(e) => handleFeedbackChange(sIndex, qIndex, e.target.value)}
                         className="w-full mt-4 p-4 text-black rounded-md border border-gray-300 bg-gray-100 cursor-pointer"
                         rows="3"
@@ -259,9 +306,7 @@ const Questionnaire = () => {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className={`bg-blue-600 text-white px-8 py-3 rounded-lg mt-6 font-semibold cursor-pointer ${
-              submitting ? "opacity-50" : ""
-            }`}
+            className={`bg-blue-600 text-white px-8 py-3 rounded-lg mt-6 font-semibold cursor-pointer ${submitting ? "opacity-50" : ""}`}
           >
             {submitting ? "Submitting..." : "Submit Feedback"}
           </button>
