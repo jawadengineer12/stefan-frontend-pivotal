@@ -5,7 +5,7 @@ import Select from "react-select";
 
 const GetQuestions = () => {
   const [sections, setSections] = useState([]);
-  const [expandedAll, setExpandedAll] = useState(false); // updated logic
+  const [expandedAll, setExpandedAll] = useState(false);
   const [expandedQuestion, setExpandedQuestion] = useState(null);
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -42,65 +42,80 @@ const GetQuestions = () => {
     }
   }, [selectedCompanyId]);
 
- const toggleSection = () => {
-  setExpandedAll((prev) => !prev);
-};
-
+  const toggleSection = () => {
+    setExpandedAll((prev) => !prev);
+  };
 
   const toggleAnswers = (id) => {
     setExpandedQuestion(expandedQuestion === id ? null : id);
   };
 
-  const handleExport = async () => {
-    setLoading(true);
-    try {
-      let allSections = [];
+const handleExport = async () => {
+  setLoading(true);
+  try {
+    let allSections = [];
 
-      if (selectedCompanyId) {
-        const res = await axios.get(`${API_BASE_URL}/admin/get-questions-by-company/${selectedCompanyId}`);
-        allSections = res.data;
-        const company = companies.find(c => c.id === selectedCompanyId);
-        allSections.forEach((s) => (s.company_name = company?.name || "Unknown"));
-      } else {
-        const companyFetches = await Promise.all(
-          companies.map(async (company) => {
-            const res = await axios.get(`${API_BASE_URL}/admin/get-questions-by-company/${company.id}`);
-            return res.data.map((s) => ({ ...s, company_name: company.name }));
-          })
-        );
-        allSections = companyFetches.flat();
-      }
+    if (selectedCompanyId) {
+      const res = await axios.get(`${API_BASE_URL}/admin/get-questions-by-company/${selectedCompanyId}`);
+      allSections = res.data;
+      const company = companies.find(c => c.id === selectedCompanyId);
+      allSections.forEach((s) => (s.company_name = company?.name || "Unknown"));
+    } else {
+      const companyFetches = await Promise.all(
+        companies.map(async (company) => {
+          const res = await axios.get(`${API_BASE_URL}/admin/get-questions-by-company/${company.id}`);
+          return res.data.map((s) => ({ ...s, company_name: company.name }));
+        })
+      );
+      allSections = companyFetches.flat();
+    }
 
-      if (!allSections.length) {
-        alert("No data available to export.");
-        return;
-      }
+    if (!allSections.length) {
+      alert("No data available to export.");
+      return;
+    }
 
-      let exportText =
-        "Company Name,Question,Average Rating,Standard Deviation,User Name,User Email,Rating,Answer,Submitted On\n";
+    // CSV Header
+    let exportText = "Company Name,Section Label,Section Title,Question,Average Rating,Standard Deviation,User Name,User Email,Rating,Answer,Submitted On\n";
 
-      allSections.forEach((section) => {
-        section.questions.forEach((q) => {
-          q.answers?.forEach((a) => {
-            exportText += `"${section.company_name}","${q.question}","${q.avg_rating ?? "N/A"}","${q.std_dev ?? "N/A"}","${a.user_name ?? "N/A"}","${a.user_email ?? "N/A"}","${a.rating ?? "N/A"}","${a.answer?.replace(/"/g, '""') ?? "No feedback given"}","${a.submitted_at ?? "N/A"}"\n`;
-          });
+    // Sort sections alphabetically by section label
+    allSections.sort((a, b) => a.label.localeCompare(b.label));
+
+    // For each section, sort its questions alphabetically by question text
+    allSections.forEach((section) => {
+      section.questions.sort((q1, q2) => q1.question.localeCompare(q2.question));
+    });
+
+    // Build CSV rows by iterating over each section and its sorted questions
+    allSections.forEach((section) => {
+      section.questions.forEach((q) => {
+        q.answers.forEach((a) => {
+          const isBlankAnswer = !a.answer || a.answer.trim() === "";
+          const answerText = isBlankAnswer ? "blank" : a.answer.replace(/"/g, '""');
+          const rating = isBlankAnswer || a.rating == null ? "N/A" : a.rating;
+
+          exportText += `"${section.company_name}","${section.label}","${section.title}","${q.question}","${q.avg_rating ?? "N/A"}","${q.std_dev ?? "N/A"}","${a.user_name ?? "N/A"}","${a.user_email ?? "N/A"}","${rating}","${answerText}","${a.submitted_at ?? "N/A"}"\n`;
         });
       });
+    });
 
-      const blob = new Blob([exportText], { type: "text/csv;charset=utf-8" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "questions_export.csv";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (err) {
-      console.error("CSV Export Error:", err);
-      alert("Failed to export CSV.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const blob = new Blob([exportText], { type: "text/csv;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "questions_export.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (err) {
+    console.error("CSV Export Error:", err);
+    alert("Failed to export CSV.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
 
   const companyOptions = companies.map((company) => ({
     value: company.id,
@@ -166,9 +181,11 @@ const GetQuestions = () => {
         </button>
       </div>
 
-      {loading ? (
-        <div className="text-center text-gray-600">Loading questions...</div>
-      ) : sections.map((section, sIndex) => (
+    {loading ? (
+  <div className="text-center text-gray-600">Loading questions...</div>
+) : [...sections]
+    .sort((a, b) => a.label.localeCompare(b.label)) // Sort sections alphabetically
+    .map((section, sIndex) => (
         <div key={sIndex} className="mb-10 border border-gray-300 rounded-lg shadow-sm">
           <div
             className="flex justify-between items-center bg-blue-50 px-4 py-3 cursor-pointer"
@@ -186,7 +203,13 @@ const GetQuestions = () => {
 
           {expandedAll && (
             <ul className="px-6 py-4">
-              {(section.questions || []).map((q, qIndex) => (
+              {[...section.questions || []]
+  .sort((a, b) => {
+    const numA = parseInt(a.label?.match(/\d+/)?.[0] || 0);
+    const numB = parseInt(b.label?.match(/\d+/)?.[0] || 0);
+    return numA - numB;
+  })
+  .map((q, qIndex) => (
                 <li key={qIndex} className="border-b border-gray-200 py-3">
                   <div className="flex justify-between items-center">
                     <div>
@@ -219,14 +242,8 @@ const GetQuestions = () => {
                             <p><strong>User Name:</strong> <span className="text-blue-800">{a.user_name || "N/A"}</span></p>
                             <p><strong>User Email:</strong> <span className="text-blue-600">{a.user_email || "N/A"}</span></p>
                             <p><strong>Submitted on:</strong> <span className="text-gray-700">{a.submitted_at ? new Date(a.submitted_at).toLocaleString() : "N/A"}</span></p>
-                            <p><strong>Rating:</strong> <span className="text-blue-700">{a.rating ?? "N/A"}</span></p>
-                            <p><strong>Answer:</strong>{" "}
-                              {a.answer?.trim() ? (
-                                a.answer
-                              ) : (
-                                <span className="italic text-gray-500">No feedback given</span>
-                              )}
-                            </p>
+                            <p><strong>Rating:</strong> <span className="text-blue-700">{a.answer?.trim() ? (a.rating ?? "N/A") : "N/A"}</span></p>
+                            <p><strong>Answer:</strong> {a.answer?.trim() ? a.answer : <span className="italic text-gray-500">blank</span>}</p>
                           </div>
                         ))
                       ) : (
