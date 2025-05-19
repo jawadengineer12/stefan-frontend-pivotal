@@ -35,36 +35,35 @@ const CreateQuestion = () => {
     setLoading(false);
   };
 
- const handleAddSection = async () => {
-  if (!newSectionTitle.trim()) return alert("Section title is required");
-  try {
-    setAddingSection(true);
+  const handleAddSection = async () => {
+    if (!newSectionTitle.trim()) return alert("Section title is required");
+    try {
+      setAddingSection(true);
+      const trimmed = newSectionTitle.trim();
+      const labelMatch = trimmed.match(/^([A-Z])\.\s*(.+)$/);
 
-    // Dynamically calculate next label
-    const existingLabels = sections.map((sec) => sec.label);
-    let nextLabel = "A";
-    for (let i = 0; i < 26; i++) {
-      const candidate = String.fromCharCode(65 + i); // 65 = 'A'
-      if (!existingLabels.includes(candidate)) {
-        nextLabel = candidate;
-        break;
+      if (!labelMatch) {
+        alert("Section title must start with a label like 'A. AI'");
+        setAddingSection(false);
+        return;
       }
+
+      const label = labelMatch[1];
+      const title = labelMatch[2];
+
+      await axios.post(`${API_BASE_URL}/admin/create-section/`, {
+        label: label,
+        title: title,
+        company_id: 1,
+      });
+
+      setNewSectionTitle("");
+      await fetchSections();
+    } catch (err) {
+      console.error("Error adding section:", err);
     }
-
-    await axios.post(`${API_BASE_URL}/admin/create-section/`, {
-      label: nextLabel,
-      title: newSectionTitle,
-      company_id: 1,
-    });
-
-    setNewSectionTitle("");
-    await fetchSections();
-  } catch (err) {
-    console.error("Error adding section:", err);
-  }
-  setAddingSection(false);
-};
-
+    setAddingSection(false);
+  };
 
   const handleAddQuestion = async () => {
     if (!selectedSectionId || !newQuestion.trim()) return;
@@ -144,9 +143,8 @@ const CreateQuestion = () => {
   return (
     <div className="py-10 px-4 max-w-5xl mx-auto w-full">
       <h2 className="text-xl font-bold mb-3 text-center md:text-left">Add Section</h2>
-
       <input
-        placeholder="New Section Title"
+        placeholder="e.g A. ARTIFICIAL INTELLIGENCE"
         value={newSectionTitle}
         onChange={(e) => setNewSectionTitle(e.target.value)}
         className="border p-2 w-full mb-2 rounded"
@@ -158,6 +156,7 @@ const CreateQuestion = () => {
       >
         {addingSection ? "🔄 Adding..." : "+ Add Section"}
       </button>
+
       <p className="text-xl font-bold mb-3 text-center md:text-left text-black">Add Questions</p>
       <select
         value={selectedSectionId}
@@ -165,11 +164,13 @@ const CreateQuestion = () => {
         className="border p-2 w-full mb-2 rounded cursor-pointer"
       >
         <option value="">-- Select Section to Add Question --</option>
-        {sections.map((section) => (
-          <option key={section.section_id} value={section.section_id}>
-            Section {section.label}: {section.title}
-          </option>
-        ))}
+        {[...sections]
+          .sort((a, b) => a.label.trim().toUpperCase().localeCompare(b.label.trim().toUpperCase()))
+          .map((section) => (
+            <option key={section.section_id} value={section.section_id}>
+              Section {section.label}: {section.title}
+            </option>
+          ))}
       </select>
 
       <textarea
@@ -197,9 +198,11 @@ const CreateQuestion = () => {
       >
         {addingQuestion ? "🔄 Adding..." : "+ Add Question"}
       </button>
-      <p className="text-xl font-bold mt-4 text-center md:text-left text-black">Modify Questions</p>
 
-      {sections.map((section) => (
+      <p className="text-xl font-bold mt-4 text-center md:text-left text-black">Modify Questions</p>
+      {[...sections]
+  .sort((a, b) => a.label.trim().toUpperCase().localeCompare(b.label.trim().toUpperCase()))
+  .map((section) => (
         <div key={section.section_id} className="mt-8 border rounded p-4 bg-gray-100">
           <div className="flex justify-between items-center mb-2">
             {editTitleId === section.section_id ? (
@@ -218,7 +221,7 @@ const CreateQuestion = () => {
               </div>
             ) : (
               <h3 className="font-bold">
-                Section {section.label}: {section.title}
+                <strong>{section.label}.</strong> {section.title}
                 <button
                   onClick={() => {
                     setEditTitleId(section.section_id);
@@ -238,74 +241,85 @@ const CreateQuestion = () => {
             </button>
           </div>
 
-          {section.questions.map((q, qIndex) => (
-            <div key={q.question_id} className="bg-white p-3 rounded border mb-2">
-              {editQuestionId === q.question_id ? (
-                <div className="flex flex-col gap-2">
-                  <textarea
-                    className="border p-2 rounded"
-                    value={editedQuestionText}
-                    onChange={(e) => setEditedQuestionText(e.target.value)}
-                  />
-                  <input
-                    className="border p-2 rounded"
-                    placeholder="+3 Rating"
-                    value={q.editingRatingPosText ?? q.rating_3_text}
-                    onChange={(e) => {
-                      const updated = [...sections];
-                      const sec = updated.find(s => s.section_id === section.section_id);
-                      const ques = sec.questions.find(qq => qq.question_id === q.question_id);
-                      ques.editingRatingPosText = e.target.value;
-                      setSections(updated);
-                    }}
-                  />
-                  <input
-                    className="border p-2 rounded"
-                    placeholder="-3 Rating"
-                    value={q.editingRatingNegText ?? q.rating_neg3_text}
-                    onChange={(e) => {
-                      const updated = [...sections];
-                      const sec = updated.find(s => s.section_id === section.section_id);
-                      const ques = sec.questions.find(qq => qq.question_id === q.question_id);
-                      ques.editingRatingNegText = e.target.value;
-                      setSections(updated);
-                    }}
-                  />
-                  <button
-                    onClick={() => handleEditQuestionSave(q, section.section_id)}
-                    className="text-green-600 text-sm text-right cursor-pointer"
-                  >
-                    {savingQuestionId === q.question_id ? "🔄 Saving..." : "✅ Save"}
-                  </button>
-                </div>
-              ) : (
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p><strong>Q{qIndex + 1}:</strong> {q.question}</p>
-                    <p className="text-green-600 text-sm">+3: {q.rating_3_text}</p>
-                    <p className="text-red-600 text-sm">-3: {q.rating_neg3_text}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setEditQuestionId(q.question_id);
-                        setEditedQuestionText(q.question);
+          {[...section.questions]
+            .sort((a, b) => {
+              const extractNum = (str) => {
+                const match = str.match(/^L(\d+)\./);
+                return match ? parseInt(match[1], 10) : Infinity;
+              };
+              return extractNum(a.question) - extractNum(b.question);
+            })
+            .map((q) => (
+              <div key={q.question_id} className="bg-white p-3 rounded border mb-2">
+                {editQuestionId === q.question_id ? (
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      className="border p-2 rounded"
+                      value={editedQuestionText}
+                      onChange={(e) => setEditedQuestionText(e.target.value)}
+                    />
+                    <input
+                      className="border p-2 rounded"
+                      placeholder="+3 Rating"
+                      value={q.editingRatingPosText ?? q.rating_3_text}
+                      onChange={(e) => {
+                        const updated = [...sections];
+                        const sec = updated.find(s => s.section_id === section.section_id);
+                        const ques = sec.questions.find(qq => qq.question_id === q.question_id);
+                        ques.editingRatingPosText = e.target.value;
+                        setSections(updated);
                       }}
-                      className="text-blue-600 cursor-pointer"
-                    >
-                      <FiEdit />
-                    </button>
+                    />
+                    <input
+                      className="border p-2 rounded"
+                      placeholder="-3 Rating"
+                      value={q.editingRatingNegText ?? q.rating_neg3_text}
+                      onChange={(e) => {
+                        const updated = [...sections];
+                        const sec = updated.find(s => s.section_id === section.section_id);
+                        const ques = sec.questions.find(qq => qq.question_id === q.question_id);
+                        ques.editingRatingNegText = e.target.value;
+                        setSections(updated);
+                      }}
+                    />
                     <button
-                      onClick={() => handleDeleteQuestion(q.question_id)}
-                      className="text-red-600 text-sm cursor-pointer"
+                      onClick={() => handleEditQuestionSave(q, section.section_id)}
+                      className="text-green-600 text-sm text-right cursor-pointer"
                     >
-                      Delete
+                      {savingQuestionId === q.question_id ? "🔄 Saving..." : "✅ Save"}
                     </button>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
+                ) : (
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p>
+                        <strong>{q.question.match(/^(L\d+\.)/)?.[0]}</strong>{" "}
+                        {q.question.replace(/^(L\d+\.)/, "").trim()}
+                      </p>
+                      <p className="text-green-600 text-sm">+3: {q.rating_3_text}</p>
+                      <p className="text-red-600 text-sm">-3: {q.rating_neg3_text}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setEditQuestionId(q.question_id);
+                          setEditedQuestionText(q.question);
+                        }}
+                        className="text-blue-600 cursor-pointer"
+                      >
+                        <FiEdit />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteQuestion(q.question_id)}
+                        className="text-red-600 text-sm cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
         </div>
       ))}
     </div>
