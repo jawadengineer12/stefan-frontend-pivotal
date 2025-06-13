@@ -87,13 +87,13 @@ export default function SignUp() {
     const matches = companies.filter((c) =>
       c.name.toLowerCase().includes(value.toLowerCase())
     );
-    setCompanySuggestions(matches.slice(0, 10)); // limit to top 10
+    setCompanySuggestions(matches.slice(0, 10)); 
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -107,40 +107,40 @@ export default function SignUp() {
           handleSignup();
         }}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-black mb-2">
+        <h2 className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-center text-black mb-2">
           Sign Up for an Account
         </h2>
-        <p className="text-center text-gray-600 mb-8 text-sm">
+        <p className="font-['Readex'] text-center text-gray-600 mb-3 text-sm">
           Please enter details to create your account
         </p>
 
-        <label className="text-sm font-medium text-gray-700 mb-1">Name</label>
+        <label className="text-sm font-medium text-gray-700 mb-1 font-['Readex']">Name</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Enter your name"
-          className="w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500"
+          className="font-['Readex'] w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 bg-green-50"
           required
         />
 
-        <label className="text-sm font-medium text-gray-700 mb-1">Email</label>
+        <label className="font-['Readex'] text-sm font-medium text-gray-700 mb-1">Email</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email address"
-          className="w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500"
+          className="w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 bg-green-50"
           required
         />
 
-        <label className="text-sm font-medium text-gray-700 mb-1">Enter Company ID</label>
+        <label className="font-['Readex'] text-sm font-medium text-gray-700 mb-1">Enter Company ID</label>
         <input
           type="text"
           value={companyName}
           onChange={(e) => handleCompanyInput(e.target.value)}
           placeholder="Type company name"
-          className="w-full mb-1 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500"
+          className="font-['Readex'] w-full mb-1 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 bg-green-50"
           required
         />
         {companyName.trim() !== "" && companySuggestions.length > 0 && (
@@ -152,7 +152,7 @@ export default function SignUp() {
                   setCompanyName(c.name);
                   setCompanySuggestions([]);
                 }}
-                className="px-4 py-2 text-sm text-black hover:bg-gray-100 cursor-pointer"
+                className="font-['Readex'] px-4 py-2 text-sm text-black hover:bg-gray-100 cursor-pointer"
               >
                 {c.name}
               </li>
@@ -160,14 +160,14 @@ export default function SignUp() {
           </ul>
         )}
 
-        <label className="text-sm font-medium text-gray-700 mb-1">Password</label>
+        <label className="font-['Readex'] text-sm font-medium text-gray-700 mb-1">Password</label>
         <div className="relative mb-4">
           <input
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter a strong password"
-            className="w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10"
+            className="font-['Readex'] w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10 bg-green-50"
             required
           />
           <button
@@ -179,14 +179,14 @@ export default function SignUp() {
           </button>
         </div>
 
-        <label className="text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+        <label className="font-['Readex'] text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
         <div className="relative mb-6">
           <input
             type={showConfirmPassword ? "text" : "password"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Re-enter your password"
-            className="w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10"
+            className="font-['Readex'] w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10 bg-green-50"
             required
           />
           <button
@@ -197,19 +197,19 @@ export default function SignUp() {
             {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
           </button>
         </div>
-        <p className="text-xs text-gray-500 mb-3 mt-[-17px]">
+        <p className="font-['Readex'] text-xs text-gray-500 mb-3 mt-[-17px]">
   Password must be at least 12 characters long and include uppercase, lowercase, number, and special character.
         </p>
 
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition cursor-pointer"
+          className="font-['Readex'] w-full bg-green-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-green-700 transition cursor-pointer"
           disabled={signingUp}
         >
           {signingUp ? (
             <div className="flex items-center justify-center">
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+              <div className="font-['Readex']w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
               Signing Up...
             </div>
           ) : (
@@ -219,15 +219,15 @@ export default function SignUp() {
 
         <div className="flex justify-center items-center my-4">
           <hr className="flex-grow border-gray-300" />
-          <span className="px-2 text-gray-500 text-sm">OR</span>
+          <span className="px-2 text-gray-500 text-sm font-['Readex']">OR</span>
           <hr className="flex-grow border-gray-300" />
         </div>
 
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-gray-600 font-['Readex']">
           Already have an account?{" "}
           <Link
             to="/login"
-            className="text-blue-600 font-semibold hover:underline cursor-pointer"
+            className="text-green-600 font-semibold hover:underline cursor-pointer font-['Readex']"
           >
             Login
           </Link>
