@@ -72,8 +72,8 @@ const GenerateFeedback = () => {
   };
 
   return (
-    <div className="p-6 text-black mt-16 md:mt-6">
-      <h2 className="text-2xl font-bold mb-4">
+    <div className="p-6 text-black mt-16 md:mt-6 font-['Readex']">
+      <h2 className="text-2xl font-bold mb-4 font-['Montserrat']">
         Generate Feedback Summary for a Company
       </h2>
 
@@ -83,7 +83,7 @@ const GenerateFeedback = () => {
           value={selectedCompany}
           onChange={setSelectedCompany}
           placeholder="-- Select Company --"
-          className="text-black"
+          className="text-black bg-green-50"
           styles={{
             control: (base) => ({
               ...base,
@@ -92,6 +92,7 @@ const GenerateFeedback = () => {
               borderRadius: 6,
               borderColor: "#D1D5DB",
               boxShadow: "none",
+              
             }),
             option: (base, { isFocused }) => ({
               ...base,
@@ -120,14 +121,14 @@ const GenerateFeedback = () => {
       <div className="flex gap-4 mb-6 items-center">
         <button
           onClick={handleGenerateCompanyReport}
-          className="bg-blue-600 text-white px-6 py-2 rounded cursor-pointer hover:bg-blue-700 disabled:opacity-50"
+          className="bg-green-600 text-white px-6 py-2 rounded cursor-pointer hover:bg-green-700 disabled:opacity-50"
           disabled={loadingReport}
         >
           {loadingReport ? "Generating..." : "Generate Feedback"}
         </button>
 
         {loadingReport && (
-          <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-6 h-6 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
         )}
 
         {report && !loadingReport && (
@@ -141,7 +142,7 @@ const GenerateFeedback = () => {
       </div>
 
       {report && (
-        <div className="mt-6 border border-gray-300 rounded p-4 bg-gray-50">
+        <div className="mt-6 border border-gray-300 rounded p-4 bg-green-50">
           <h3 className="text-lg font-semibold mb-2">Company: {report.company}</h3>
           <p className="font-semibold">Average Rating: {report.average_rating}</p>
 
