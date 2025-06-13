@@ -141,27 +141,27 @@ const CreateQuestion = () => {
   };
 
   return (
-    <div className="py-10 px-4 max-w-5xl mx-auto w-full">
-      <h2 className="text-xl font-bold mb-3 text-center md:text-left">Add Section</h2>
+    <div className="py-10 px-4 max-w-5xl mx-auto w-full font-['Readex']">
+      <h2 className="font-['Montserrat'] text-xl font-bold mb-3 text-center md:text-left">Add Section</h2>
       <input
         placeholder="e.g A. ARTIFICIAL INTELLIGENCE"
         value={newSectionTitle}
         onChange={(e) => setNewSectionTitle(e.target.value)}
-        className="border p-2 w-full mb-2 rounded"
+        className="border p-2 w-full mb-2 rounded bg-green-50"
       />
       <button
         onClick={handleAddSection}
-        className="bg-blue-600 text-white px-4 py-2 rounded mb-6 cursor-pointer"
+        className="bg-green-600 text-white px-4 py-2 rounded mb-6 cursor-pointer"
         disabled={addingSection}
       >
         {addingSection ? "🔄 Adding..." : "+ Add Section"}
       </button>
 
-      <p className="text-xl font-bold mb-3 text-center md:text-left text-black">Add Questions</p>
+      <p className="font-['Montserrat'] text-xl font-bold mb-3 text-center md:text-left text-black">Add Questions</p>
       <select
         value={selectedSectionId}
         onChange={(e) => setSelectedSectionId(e.target.value)}
-        className="border p-2 w-full mb-2 rounded cursor-pointer"
+        className="border p-2 w-full mb-2 rounded cursor-pointer bg-green-50"
       >
         <option value="">-- Select Section to Add Question --</option>
         {[...sections]
@@ -177,33 +177,33 @@ const CreateQuestion = () => {
         placeholder="Enter question"
         value={newQuestion}
         onChange={(e) => setNewQuestion(e.target.value)}
-        className="border p-2 w-full mb-2 rounded"
+        className="border p-2 w-full mb-2 rounded bg-green-50"
       />
       <input
         placeholder="+3 Rating Text"
         value={newQuestionTextPositive}
         onChange={(e) => setNewQuestionTextPositive(e.target.value)}
-        className="border p-2 w-full mb-2 rounded"
+        className="border p-2 w-full mb-2 rounded bg-green-50"
       />
       <input
         placeholder="-3 Rating Text"
         value={newQuestionTextNegative}
         onChange={(e) => setNewQuestionTextNegative(e.target.value)}
-        className="border p-2 w-full mb-4 rounded"
+        className="border p-2 w-full mb-4 rounded bg-green-50"
       />
       <button
         onClick={handleAddQuestion}
-        className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer"
+        className="bg-green-600 text-white px-4 py-2 rounded cursor-pointer"
         disabled={addingQuestion}
       >
         {addingQuestion ? "🔄 Adding..." : "+ Add Question"}
       </button>
 
-      <p className="text-xl font-bold mt-4 text-center md:text-left text-black">Modify Questions</p>
+      <p className="font-['Montserrat'] text-xl font-bold mt-4 text-center md:text-left text-black">Modify Questions</p>
       {[...sections]
   .sort((a, b) => a.label.trim().toUpperCase().localeCompare(b.label.trim().toUpperCase()))
   .map((section) => (
-        <div key={section.section_id} className="mt-8 border rounded p-4 bg-gray-100">
+        <div key={section.section_id} className="mt-8 border rounded p-4 bg-green-50">
           <div className="flex justify-between items-center mb-2">
             {editTitleId === section.section_id ? (
               <div className="flex w-full gap-2">
@@ -227,7 +227,7 @@ const CreateQuestion = () => {
                     setEditTitleId(section.section_id);
                     setEditedTitle(section.title);
                   }}
-                  className="ml-2 text-blue-600 cursor-pointer"
+                  className="ml-2 text-green-600 cursor-pointer"
                 >
                   <FiEdit />
                 </button>
@@ -250,7 +250,7 @@ const CreateQuestion = () => {
               return extractNum(a.question) - extractNum(b.question);
             })
             .map((q) => (
-              <div key={q.question_id} className="bg-white p-3 rounded border mb-2">
+              <div key={q.question_id} className="bg-white p-3 rounded border mb-2 ">
                 {editQuestionId === q.question_id ? (
                   <div className="flex flex-col gap-2">
                     <textarea
@@ -284,13 +284,13 @@ const CreateQuestion = () => {
                     />
                     <button
                       onClick={() => handleEditQuestionSave(q, section.section_id)}
-                      className="text-green-600 text-sm text-right cursor-pointer"
+                      className="text-green-600 text-sm text-right cursor-pointer "
                     >
                       {savingQuestionId === q.question_id ? "🔄 Saving..." : "✅ Save"}
                     </button>
                   </div>
                 ) : (
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start ">
                     <div>
                       <p>
                         <strong>{q.question.match(/^(L\d+\.)/)?.[0]}</strong>{" "}
@@ -305,7 +305,7 @@ const CreateQuestion = () => {
                           setEditQuestionId(q.question_id);
                           setEditedQuestionText(q.question);
                         }}
-                        className="text-blue-600 cursor-pointer"
+                        className="text-green-600 cursor-pointer"
                       >
                         <FiEdit />
                       </button>
