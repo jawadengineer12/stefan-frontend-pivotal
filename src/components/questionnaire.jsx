@@ -195,14 +195,14 @@ const Questionnaire = () => {
   };
 
   return (
-    <section className="py-20 px-6 flex flex-col bg-gray-200 min-h-screen">
+    <section className="py-20 px-6 flex flex-col bg-gray-200 min-h-screen font-['Readex']">
       <div className="container mx-auto max-w-4xl">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Questions</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 font-['Montserrat']">Questions</h2>
         <p className="text-gray-600 text-center mb-8">Your ratings and answers are saved step by step. You can always return to the answers and adjust them later.</p>
 
         {submitted && (
           <div className="text-center bg-white p-10 rounded shadow mb-8">
-            <h3 className="text-2xl font-semibold text-blue-600 mb-4">Thank you!</h3>
+            <h3 className="text-2xl font-semibold text-green-600 mb-4">Thank you!</h3>
             <p className="text-gray-700">
               Your feedback has been submitted successfully. You may continue editing your answers if needed.
             </p>
@@ -212,10 +212,10 @@ const Questionnaire = () => {
         {sections.map((section, sIndex) => (
           <div key={sIndex} className="mb-10 bg-white rounded-lg shadow-md overflow-hidden">
             <div
-              className="flex justify-between items-center px-6 py-4 bg-gray-100 cursor-pointer"
+              className="flex justify-between items-center px-6 py-4 bg-green-100 cursor-pointer"
               onClick={() => setExpandedSection(expandedSection === section.label ? null : section.label)}
             >
-              <h3 className="text-xl font-bold text-gray-700">
+              <h3 className="text-xl font-bold text-gray-700 ">
                 Section {section.label}: {section.title}
               </h3>
               <span className="text-2xl font-bold text-gray-600">{expandedSection === section.label ? "−" : "+"}</span>
@@ -291,7 +291,7 @@ const Questionnaire = () => {
                         value={question.feedback}
                         disabled={question.cantAnswer}
                         onChange={(e) => handleFeedbackChange(sIndex, qIndex, e.target.value)}
-                        className="w-full mt-4 p-4 text-black rounded-md border border-gray-300 bg-gray-100 cursor-pointer"
+                        className="w-full mt-4 p-4 text-black rounded-md border border-gray-300  cursor-pointer bg-green-50"
                         rows="3"
                       ></textarea>
                     </div>
@@ -306,7 +306,7 @@ const Questionnaire = () => {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className={`bg-blue-600 text-white px-8 py-3 rounded-lg mt-6 font-semibold cursor-pointer ${submitting ? "opacity-50" : ""}`}
+            className={`bg-green-600 text-white px-8 py-3 rounded-lg mt-6 font-semibold cursor-pointer ${submitting ? "opacity-50" : ""}`}
           >
             {submitting ? "Submitting..." : "Submit Feedback"}
           </button>
