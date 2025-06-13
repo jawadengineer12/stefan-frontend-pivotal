@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { resendOtp, verifyOtp } from '../../api/auth';
+import { resendOtp, verifyOtp } from '../../api/auth.js';
 import { useNavigate } from 'react-router-dom';
 import AuthImage from '../../components/authImage/AUTHImage';
 
@@ -49,10 +49,10 @@ const OTPVerification = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen justify-center items-center overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen justify-center items-center overflow-hidden font-['Readex']">
       <div className="w-full md:w-[385px] h-screen flex justify-center items-center px-4">
         <div className="w-full max-w-md md:ml-20 mx-auto flex flex-col items-center">
-          <h2 className="text-[34px] font-bold mb-6 text-blue-500">Verify OTP</h2>
+          <h2 className="text-[34px] font-bold mb-6 text-green-500">Verify OTP</h2>
           <p className="mb-3 text-sm text-gray-700">Code sent to: <strong>{email}</strong></p>
 
           <input
@@ -69,7 +69,7 @@ const OTPVerification = () => {
 
           <button
             onClick={handleContinue}
-            className="w-full bg-blue-500 text-white p-3 rounded-[140px] mb-3 cursor-pointer flex items-center justify-center"
+            className="w-full bg-green-500 text-white p-3 rounded-[140px] mb-3 cursor-pointer flex items-center justify-center"
             disabled={loading}
           >
             {loading ? (
@@ -84,13 +84,13 @@ const OTPVerification = () => {
 
           <button
             onClick={handleResendOtp}
-            className="text-blue-600 underline text-sm cursor-pointer"
+            className="text-green-600 underline text-sm cursor-pointer"
           >
             Resend OTP
           </button>
 
           {resendMessage && (
-            <p className="text-blue-600 text-sm mt-2">{resendMessage}</p>
+            <p className="text-green-600 text-sm mt-2">{resendMessage}</p>
           )}
         </div>
       </div>
@@ -105,4 +105,3 @@ const OTPVerification = () => {
 };
 
 export default OTPVerification;
-//verification
