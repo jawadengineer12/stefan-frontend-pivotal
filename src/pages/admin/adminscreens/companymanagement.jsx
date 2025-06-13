@@ -80,10 +80,10 @@ const CompanyManagement = () => {
   };
 
   return (
-    <div className="py-10 px-4 max-w-4xl mx-auto w-full">
-      <h2 className="text-2xl font-bold mb-6 text-center md:text-left">Manage Companies</h2>
+    <div className="py-10 px-4 max-w-4xl mx-auto w-full font-['Readex']">
+      <h2 className="font-['Montserrat'] text-2xl font-bold mb-6 text-center md:text-left">Manage Companies</h2>
 
-      <div className="mb-6 flex flex-col sm:flex-row gap-4">
+      <div className="mb-6 flex flex-col sm:flex-row gap-4 bg-green-50">
         <input
           placeholder="Enter new company name"
           value={newCompany}
@@ -94,7 +94,7 @@ const CompanyManagement = () => {
           onClick={handleAddCompany}
           disabled={saving}
           className={`px-6 py-2 rounded text-white cursor-pointer ${
-            saving ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
+            saving ? "bg-green-300" : "bg-green-600 hover:bg-green-700"
           }`}
         >
           {saving ? "Saving..." : "+ Add Company"}
