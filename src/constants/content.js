@@ -1,8 +1,8 @@
 const content = {
-    appName: "QuestAIre",
+    appName: "PIPO",
  
     appDescription:
-      "Welcome to QuestAIre",
+      "Welcome to the World of Data-Driven Strategy Reviews",
   };
   
   export default content;
