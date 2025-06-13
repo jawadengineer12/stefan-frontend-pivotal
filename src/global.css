@@ -1,9 +1,6 @@
-
-
-/* Apply fonts globally */
 @layer base {
   body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Readex Pro', sans-serif !important;
   }
 
   .font-bebas {
