@@ -123,8 +123,8 @@ const handleExport = async () => {
   }));
 
   return (
-    <div className="w-full min-h-screen text-black p-6 mt-16 md:mt-6">
-      <h1 className="text-xl font-bold mb-4 text-center md:text-left">
+    <div className="w-full min-h-screen text-black p-6 mt-16 md:mt-6 font-['Readex']">
+      <h1 className="text-xl font-bold mb-4 text-center md:text-left font-['Montserrat']">
         Please select a company
       </h1>
 
@@ -175,7 +175,7 @@ const handleExport = async () => {
 
         <button
           onClick={handleExport}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer"
         >
           Export .CSV
         </button>
@@ -188,14 +188,14 @@ const handleExport = async () => {
     .map((section, sIndex) => (
         <div key={sIndex} className="mb-10 border border-gray-300 rounded-lg shadow-sm">
           <div
-            className="flex justify-between items-center bg-blue-50 px-4 py-3 cursor-pointer"
+            className="flex justify-between items-center bg-green-50 px-4 py-3 cursor-pointer"
             onClick={toggleSection}
           >
             <h3 className="text-lg font-semibold">
               Section {section.label}: {section.title}
             </h3>
             <div>
-              <button className="text-blue-600 font-bold text-xl cursor-pointer">
+              <button className="text-green-600 font-bold text-xl cursor-pointer">
                 {expandedAll ? "−" : "+"}
               </button>
             </div>
@@ -227,7 +227,7 @@ const handleExport = async () => {
                       </button>
                       <button
                         onClick={() => toggleAnswers(q.question_id)}
-                        className="bg-blue-600 text-white px-4 py-1 rounded cursor-pointer"
+                        className="bg-green-600 text-white px-4 py-1 rounded cursor-pointer"
                       >
                         {expandedQuestion === q.question_id ? "Hide Answers" : "View Answers"}
                       </button>
@@ -239,10 +239,10 @@ const handleExport = async () => {
                       {q.answers?.length > 0 ? (
                         q.answers.map((a, idx) => (
                           <div key={idx} className="bg-gray-100 p-3 rounded shadow-sm text-sm">
-                            <p><strong>User Name:</strong> <span className="text-blue-800">{a.user_name || "N/A"}</span></p>
-                            <p><strong>User Email:</strong> <span className="text-blue-600">{a.user_email || "N/A"}</span></p>
+                            <p><strong>User Name:</strong> <span className="text-green-800">{a.user_name || "N/A"}</span></p>
+                            <p><strong>User Email:</strong> <span className="text-green-600">{a.user_email || "N/A"}</span></p>
                             <p><strong>Submitted on:</strong> <span className="text-gray-700">{a.submitted_at ? new Date(a.submitted_at).toLocaleString() : "N/A"}</span></p>
-                            <p><strong>Rating:</strong> <span className="text-blue-700">{a.answer?.trim() ? (a.rating ?? "N/A") : "N/A"}</span></p>
+                            <p><strong>Rating:</strong> <span className="text-green-700">{a.answer?.trim() ? (a.rating ?? "N/A") : "N/A"}</span></p>
                             <p><strong>Answer:</strong> {a.answer?.trim() ? a.answer : <span className="italic text-gray-500">blank</span>}</p>
                           </div>
                         ))
