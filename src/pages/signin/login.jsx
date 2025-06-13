@@ -51,7 +51,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden font-['Readex'] ">
       <form
         className="w-full md:w-1/2 flex flex-col justify-center px-6 max-w-md mx-auto"
         onSubmit={(e) => {
@@ -59,10 +59,10 @@ export default function SignIn() {
           handleLogin();
         }}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-black mb-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-black mb-2 font-readex">
           Sign In to Your Account
         </h2>
-        <p className="text-center text-gray-600 mb-8 text-sm">
+        <p className="text-center text-gray-600 mb-8 text-sm font-readex">
           Please enter details to login to your account
         </p>
 
@@ -78,7 +78,7 @@ export default function SignIn() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email address"
-          className="w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500"
+          className="w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 bg-green-50"
         />
 
         <label className="text-sm font-medium text-gray-700 mb-1">
@@ -90,7 +90,7 @@ export default function SignIn() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
-            className="w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10"
+            className="w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10 bg-green-50"
           />
           <button
             type="button"
@@ -133,11 +133,11 @@ export default function SignIn() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition cursor-pointer"
+          className="w-full bg-green-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-green-700 transition cursor-pointer"
           disabled={loading}
         >
           {loading ? (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center font-readex ">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
               Logging in...
             </div>
@@ -156,7 +156,7 @@ export default function SignIn() {
           Do not have an account?{" "}
           <Link
             to="/signup"
-            className="text-blue-600 font-semibold hover:underline"
+            className="text-green-600 font-semibold hover:underline"
           >
             Create Account
           </Link>
