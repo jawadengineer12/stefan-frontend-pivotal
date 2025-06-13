@@ -18,7 +18,7 @@ const CallToAction = () => {
         </p>
         <button
           onClick={() => navigate("/questionnaire")}
-          className="bg-white text-[#4169E1] px-6 py-3 rounded-lg font-semibold transition-all hover:bg-blue-100 cursor-pointer"
+          className="bg-white text-[#4169E1] px-6 py-3 rounded-lg font-semibold transition-all hover:bg-green-100 cursor-pointer"
         >
           Start Questionnaire
         </button>
