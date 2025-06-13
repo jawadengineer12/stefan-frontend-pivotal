@@ -88,7 +88,7 @@ export default function AdminLogin() {
         <button
           type="submit" // ✅ Submit on Enter
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition cursor-pointer"
+          className="w-full bg-green-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-green-700 transition cursor-pointer"
         >
           {loading ? (
             <div className="flex items-center justify-center">
@@ -105,7 +105,7 @@ export default function AdminLogin() {
            <button
             type="button"
             onClick={() => navigate("/login")}
-            className="mt-2 text-blue-600 font-semibold hover:underline cursor-pointer"
+            className="mt-2 text-green-600 font-semibold hover:underline cursor-pointer"
           >
             Login as User
           </button> 
