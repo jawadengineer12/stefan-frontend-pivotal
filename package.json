@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": "18.x"
+  },
   "dependencies": {
     "@fontsource/poppins": "^5.2.5",
     "@tailwindcss/forms": "^0.5.10",
