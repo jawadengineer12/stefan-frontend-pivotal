@@ -57,7 +57,7 @@ const CreateSectionWithQuestions = () => {
           onChange={(e) => setCurrentSection({ ...currentSection, title: e.target.value })}
           className="border p-2 w-full mb-2"
         />
-        <button onClick={handleAddSection} className="bg-blue-600 text-white px-4 py-2 rounded">
+        <button onClick={handleAddSection} className="bg-green-600 text-white px-4 py-2 rounded">
           + Add Section
         </button>
       </div>
@@ -90,7 +90,7 @@ const CreateSectionWithQuestions = () => {
         </div>
       ))}
 
-      <button onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2 rounded">
+      <button onClick={handleSubmit} className="bg-green-600 text-white px-6 py-2 rounded">
         Submit All
       </button>
     </div>
