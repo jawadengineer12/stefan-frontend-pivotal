@@ -25,7 +25,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white text-blue-600 p-4 shadow-md fixed top-0 w-full z-50 md:justify-between">
+    <header className="bg-white text-green-600 p-4 shadow-md fixed top-0 w-full z-50 md:justify-between">
       <div className="container mx-auto flex items-center justify-between px-4">
         <div className="text-2xl font-bold cursor-pointer">QuestAire</div>
 
@@ -33,22 +33,22 @@ const Header = () => {
         <nav className="hidden md:flex space-x-6 items-center text-black text-base lg:text-lg">
           <a
             href="#Introduction"
-            className="hover:text-blue-500 cursor-pointer"
+            className="hover:text-green-500 cursor-pointer"
           >
             Introduction
           </a>
-          <a href="#KeyFeatures" className="hover:text-blue-500 cursor-pointer">
+          <a href="#KeyFeatures" className="hover:text-green-500 cursor-pointer">
             Key Features
           </a>
           <a
             href="#how-it-works"
-            className="hover:text-blue-500 cursor-pointer"
+            className="hover:text-green-500 cursor-pointer"
           >
             How It Works
           </a>
           <span
             onClick={() => navigate("/questionnaire")}
-            className="hover:text-blue-500 cursor-pointer"
+            className="hover:text-green-500 cursor-pointer"
           >
             Questionnaire
           </span>
@@ -58,14 +58,14 @@ const Header = () => {
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
-              className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 cursor-pointer"
+              className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 cursor-pointer"
             >
               Logout
             </button>
           ) : (
             <button
               onClick={handleLogin}
-              className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 cursor-pointer"
+              className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 cursor-pointer"
             >
               Login
             </button>
@@ -105,14 +105,14 @@ const Header = () => {
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
+              className="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 cursor-pointer"
             >
               Logout
             </button>
           ) : (
             <button
               onClick={handleLogin}
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
+              className="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 cursor-pointer"
             >
               Login
             </button>
