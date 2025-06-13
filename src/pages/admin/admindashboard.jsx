@@ -15,7 +15,7 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden ">
       <AdminSidebar
         sidebarVisible={sidebarVisible}
         setSidebarVisible={setSidebarVisible}
