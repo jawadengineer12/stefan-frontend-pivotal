@@ -29,7 +29,7 @@ const Benefits = () => {
           ].map((benefit, i) => (
             <div
               key={i}
-              className="bg-blue-100 p-6 rounded-lg shadow-lg flex items-start sm:items-center"
+              className="bg-green-100 p-6 rounded-lg shadow-lg flex items-start sm:items-center"
             >
               <img src={slider} alt="Slider" className="w-10 h-10 mr-4" />
               <div className="text-left">
