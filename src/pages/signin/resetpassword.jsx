@@ -43,10 +43,10 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen w-full overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-screen w-full overflow-hidden font-['Readex']">
       <div className="w-full lg:w-1/2 h-screen flex justify-center items-center px-4">
         <div className="w-full max-w-[400px] mx-auto flex flex-col items-center">
-          <h1 className="text-[32px] font-bold mb-12 text-blue-500 text-center">Reset Password</h1>
+          <h1 className="text-[32px] font-bold mb-12 text-green-500 text-center">Reset Password</h1>
 
           <div className="relative mb-6 w-full">
             <input
@@ -84,7 +84,7 @@ const ResetPassword = () => {
 
           <button
             onClick={handleReset}
-            className="w-full bg-blue-500 text-white p-3 rounded-[140px] cursor-pointer flex justify-center items-center"
+            className="w-full bg-green-500 text-white p-3 rounded-[140px] cursor-pointer flex justify-center items-center"
             disabled={loading}
           >
             {loading ? (
