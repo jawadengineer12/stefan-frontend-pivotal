@@ -17,7 +17,6 @@ const Forgot = () => {
       setSuccessMsg("✅ OTP sent successfully to your email.");
       setErrorMsg("");
       localStorage.setItem("resetEmail", email);
-
       setTimeout(() => navigate("/otpverification"), 2000);
     } catch (err) {
       setSuccessMsg("");
@@ -28,10 +27,11 @@ const Forgot = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen justify-center items-center overflow-hidden">
-      <div className="w-full md:w-[385px] flex justify-center items-center px-4">
-        <div className="w-full max-w-md md:ml-20 mx-auto text-center">
-          <h2 className="text-[32px] font-bold mb-4 text-blue-500">Forgot Password</h2>
+    <div className="flex flex-col lg:flex-row h-screen w-screen overflow-hidden font-['Readex']">
+      {/* Left Section - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6">
+        <div className="w-full max-w-md text-center">
+          <h2 className="text-[32px] font-bold mb-4 text-green-500">Forgot Password</h2>
 
           {successMsg && (
             <div className="bg-green-100 text-green-700 border border-green-400 px-4 py-2 rounded mb-3 text-sm">
@@ -49,11 +49,11 @@ const Forgot = () => {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full mb-4 p-3 border rounded-[140px] text-black"
+            className="w-full mb-4 p-3 border rounded-[140px] text-black bg-green-50"
           />
           <button
             onClick={handleSubmit}
-            className="w-full bg-blue-500 text-white p-3 rounded-[140px] flex items-center justify-center cursor-pointer"
+            className="w-full bg-green-500 text-white p-3 rounded-[140px] flex items-center justify-center cursor-pointer hover:bg-green-600"
             disabled={loading}
           >
             {loading ? (
@@ -68,10 +68,9 @@ const Forgot = () => {
         </div>
       </div>
 
-      <div className="hidden lg:flex h-screen w-[75%] justify-end items-center">
-        <div className="h-full w-full">
-          <AuthImage />
-        </div>
+      {/* Right Section - Image */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6">
+        <AuthImage />
       </div>
     </div>
   );
