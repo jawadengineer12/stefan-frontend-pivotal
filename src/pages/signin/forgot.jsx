@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { forgotPassword } from "../../api/auth";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { forgotPassword } from "../../api/auth";
 import AuthImage from "../../components/authImage/AUTHImage";
 
 const Forgot = () => {
@@ -27,33 +27,54 @@ const Forgot = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen w-screen overflow-hidden font-['Readex']">
+    <div className="flex flex-col lg:flex-row h-screen w-screen overflow-hidden font-['Readex_Pro']">
       {/* Left Section - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6">
         <div className="w-full max-w-md text-center">
-          <h2 className="text-[32px] font-bold mb-4 text-green-500">Forgot Password</h2>
+          {/* Header with custom color */}
+          <h2
+            className="text-[32px] font-bold mb-4"
+            style={{ color: "#548B51" }}
+          >
+            Forgot Password
+          </h2>
 
+          {/* Success Message Box */}
           {successMsg && (
-            <div className="bg-green-100 text-green-700 border border-green-400 px-4 py-2 rounded mb-3 text-sm">
+            <div
+              className="text-sm border px-4 py-2 rounded mb-3"
+              style={{
+                backgroundColor: "#E9F3EA",
+                color: "#548B51",
+                borderColor: "#A3C0A5",
+              }}
+            >
               {successMsg}
             </div>
           )}
+
+          {/* Error Message Box */}
           {errorMsg && (
             <div className="bg-red-100 text-red-700 border border-red-400 px-4 py-2 rounded mb-3 text-sm">
               {errorMsg}
             </div>
           )}
 
+          {/* Email Input */}
           <input
             type="email"
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full mb-4 p-3 border rounded-[140px] text-black bg-green-50"
+            className="w-full mb-4 p-3 border rounded-[140px] text-black"
+            style={{ backgroundColor: "#E9F3EA" }}
           />
+
+          {/* Submit Button */}
           <button
             onClick={handleSubmit}
-            className="w-full bg-green-500 text-white p-3 rounded-[140px] flex items-center justify-center cursor-pointer hover:bg-green-600"
+            className="w-full text-white p-3 rounded-[140px] flex items-center justify-center cursor-pointer transition hover:brightness-90"
+            style={{ backgroundColor: "#548B51" }}
             disabled={loading}
           >
             {loading ? (
