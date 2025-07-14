@@ -13,10 +13,11 @@ export default function AuthImage() {
     >
       {/* Overlay container for app name and description */}
       <div className="absolute top-10 left-1/2 transform -translate-x-1/2 text-center w-full px-4">
-        <h2 className="font-['Montserrat'] font-semibold text-xl text-black">
+        <h2 className="font-semibold text-xl text-black"
+        style={{ fontFamily: "Montserrat", fontWeight: 600 }}>
           {content.appName}
         </h2>
-        <p className="font-['Readex'] mt-2 text-black text-sm max-w-md mx-auto">
+        <p className="font-['Readex_Pro'] mt-2 text-black text-sm max-w-md mx-auto">
           {descriptions[currentIndex]}
         </p>
       </div>
