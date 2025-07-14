@@ -49,8 +49,6 @@ const HowItWorks = () => {
           ))}
         </div>
       </div>
-
-      {/* Optional bottom wave */}
       <div className="mt-16">
         <WaveLine />
       </div>
