@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import AuthImage from "../../components/authImage/AUTHImage";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api/auth";
+import AuthImage from "../../components/authImage/AUTHImage";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -51,7 +51,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden font-['Readex'] ">
+    <div className="flex h-screen overflow-hidden font-['Readex_Pro'] ">
       <form
         className="w-full md:w-1/2 flex flex-col justify-center px-6 max-w-md mx-auto"
         onSubmit={(e) => {
@@ -59,10 +59,12 @@ export default function SignIn() {
           handleLogin();
         }}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-black mb-2 font-readex">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-black mb-2 "style={{ fontFamily: "Montserrat", fontWeight: 600 }}
+        >
+          
           Sign In to Your Account
         </h2>
-        <p className="text-center text-gray-600 mb-8 text-sm font-readex">
+        <p className="text-center text-gray-600 mb-8 text-sm ">
           Please enter details to login to your account
         </p>
 
@@ -133,7 +135,8 @@ export default function SignIn() {
 
         <button
           type="submit"
-          className="w-full bg-green-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-green-700 transition cursor-pointer"
+          className="w-full text-white py-3 rounded-md text-lg font-semibold transition cursor-pointer hover:brightness-90"
+          style={{ backgroundColor: "#548B51" }}
           disabled={loading}
         >
           {loading ? (
@@ -156,7 +159,7 @@ export default function SignIn() {
           Do not have an account?{" "}
           <Link
             to="/signup"
-            className="text-green-600 font-semibold hover:underline"
+            className="text-[#548B51] font-semibold hover:underline"
           >
             Create Account
           </Link>
