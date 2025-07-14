@@ -195,14 +195,16 @@ const Questionnaire = () => {
   };
 
   return (
-    <section className="py-20 px-6 flex flex-col bg-gray-200 min-h-screen font-['Readex']">
+    <section className="py-20 px-6 flex flex-col  min-h-screen font-[Readex_Pro]"
+    style={{ backgroundColor: "#E8E6DC" }}
+    >
       <div className="container mx-auto max-w-4xl">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 font-['Montserrat']">Questions</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 "style={{ fontFamily: "Montserrat", fontWeight: 600 }}>Questions</h2>
         <p className="text-gray-600 text-center mb-8">Your ratings and answers are saved step by step. You can always return to the answers and adjust them later.</p>
 
         {submitted && (
           <div className="text-center bg-white p-10 rounded shadow mb-8">
-            <h3 className="text-2xl font-semibold text-green-600 mb-4">Thank you!</h3>
+            <h3 className="text-2xl font-semibold text-[#548B51] mb-4">Thank you!</h3>
             <p className="text-gray-700">
               Your feedback has been submitted successfully. You may continue editing your answers if needed.
             </p>
@@ -212,10 +214,11 @@ const Questionnaire = () => {
         {sections.map((section, sIndex) => (
           <div key={sIndex} className="mb-10 bg-white rounded-lg shadow-md overflow-hidden">
             <div
-              className="flex justify-between items-center px-6 py-4 bg-green-100 cursor-pointer"
+              className="flex justify-between items-center px-6 py-4 cursor-pointer"
+              style={{ backgroundColor: "#548B51" }}
               onClick={() => setExpandedSection(expandedSection === section.label ? null : section.label)}
             >
-              <h3 className="text-xl font-bold text-gray-700 ">
+              <h3 className="text-xl font-bold text-white ">
                 Section {section.label}: {section.title}
               </h3>
               <span className="text-2xl font-bold text-gray-600">{expandedSection === section.label ? "−" : "+"}</span>
@@ -231,7 +234,7 @@ const Questionnaire = () => {
                   transition={{ duration: 0.3 }}
                 >
                   {section.questions.map((question, qIndex) => (
-                    <div key={question.question_id} className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+                    <div key={question.question_id} className=" border border-gray-200 rounded-lg p-6 mb-6">
                       <p className="text-lg font-medium text-gray-800 mb-4">{question.question}</p>
 
                       <div className="mb-4">
@@ -273,14 +276,14 @@ const Questionnaire = () => {
                           <span>0</span>
                           <span>1</span>
                           <span>2</span>
-                          <span className="text-green-600">+3</span>
+                          <span className="text-[#548B51]">+3</span>
                         </div>
 
                         <div className="flex justify-between text-xs text-black mt-1 min-h-[1rem]">
                           <span className="text-left text-[11px] text-red-600 w-1/2">
                             {question.rating_neg3_text?.trim()}
                           </span>
-                          <span className="text-right text-[11px] text-green-600 w-1/2">
+                          <span className="text-right text-[11px] text-[#548B51] w-1/2">
                             {question.rating_3_text?.trim()}
                           </span>
                         </div>
@@ -306,7 +309,9 @@ const Questionnaire = () => {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className={`bg-green-600 text-white px-8 py-3 rounded-lg mt-6 font-semibold cursor-pointer ${submitting ? "opacity-50" : ""}`}
+          
+            className={` text-white px-8 py-3 rounded-lg hover:brightness-90 mt-6 font-semibold cursor-pointer ${submitting ? "opacity-50" : ""}`}
+            style={{ backgroundColor: "#548B51" }}
           >
             {submitting ? "Submitting..." : "Submit Feedback"}
           </button>
