@@ -8,7 +8,7 @@ export default function AuthImage() {
 
   return (
     <div
-      className="flex relative w-[500PX] h-full items-center justify-center bg-white sm:hidden md:flex"
+      className="flex relative w-[450PX] h-full items-center justify-center bg-white sm:hidden md:flex"
       style={{ backgroundImage: `url(${authimage})`, backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center" }}
     >
       {/* Overlay container for app name and description */}
@@ -17,7 +17,7 @@ export default function AuthImage() {
         style={{ fontFamily: "Montserrat", fontWeight: 600 }}>
           {content.appName}
         </h2>
-        <p className="font-['Readex_Pro'] mt-2 text-black text-sm max-w-md mx-auto">
+        <p className="font-['Readex_Pro'] mt-2 text-black text-sm max-w-md mx-auto ">
           {descriptions[currentIndex]}
         </p>
       </div>
