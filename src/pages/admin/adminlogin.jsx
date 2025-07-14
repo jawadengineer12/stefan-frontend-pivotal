@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import axios from "axios";
+import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import AuthImage from "../../components/authImage/AUTHImage";
-import axios from "axios";
 import API_BASE_URL from "../../constants/config";
 
 export default function AdminLogin() {
@@ -27,7 +27,8 @@ export default function AdminLogin() {
       // Redirect on success
       navigate("/admin/dashboard");
     } catch (err) {
-      const message = err.response?.data?.detail || "Login failed. Please try again.";
+      const message =
+        err.response?.data?.detail || "Login failed. Please try again.";
       setError(message);
     } finally {
       setLoading(false);
@@ -36,16 +37,18 @@ export default function AdminLogin() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      
       {/* ✅ CHANGED from <div> to <form> and added onSubmit */}
       <form
-        className="w-full md:w-1/2 flex flex-col justify-center px-6 max-w-md mx-auto"
+        className="w-full md:w-1/2 flex flex-col justify-center px-6 max-w-md mx-auto font-[Readex_Pro]"
         onSubmit={(e) => {
           e.preventDefault(); // ✅ prevent page reload
           handleAdminLogin(); // ✅ trigger login
         }}
       >
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-black mb-2">
+        <h2
+          className="text-2xl sm:text-3xl font-bold text-center text-black mb-2"
+          style={{ fontFamily: "Montserrat", fontWeight: 600 }}
+        >
           Admin Login
         </h2>
         <p className="text-center text-gray-600 mb-6 text-sm">
@@ -67,7 +70,9 @@ export default function AdminLogin() {
           className="w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500"
         />
 
-        <label className="text-sm font-medium text-gray-700 mb-1">Password</label>
+        <label className="text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
         <div className="relative mb-6">
           <input
             type={showPassword ? "text" : "password"}
@@ -88,7 +93,8 @@ export default function AdminLogin() {
         <button
           type="submit" // ✅ Submit on Enter
           disabled={loading}
-          className="w-full bg-green-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-green-700 transition cursor-pointer"
+          className="w-full text-white py-3 rounded-md text-lg font-semibold transition cursor-pointer"
+          style={{ backgroundColor: '#548B51' }}
         >
           {loading ? (
             <div className="flex items-center justify-center">
@@ -105,7 +111,7 @@ export default function AdminLogin() {
            <button
             type="button"
             onClick={() => navigate("/login")}
-            className="mt-2 text-green-600 font-semibold hover:underline cursor-pointer"
+            className="mt-2 text-[#548B51] font-semibold hover:underline cursor-pointer"
           >
             Login as User
           </button> 
