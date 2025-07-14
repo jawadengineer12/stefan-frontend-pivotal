@@ -1,15 +1,14 @@
-import React from "react";
-import AuthImage from "../../components/authImage/AUTHImage";
 import { Link } from "react-router-dom";
+import AuthImage from "../../components/authImage/AUTHImage";
 //import LockImage from "../../components/authImage/lockImage";
 
 export default function ResetSuccessfully() {
   return (
-    <div className="flex flex-col sm:flex-row min-h-screen overflow-hidden font-['Readex']">
+    <div className="flex flex-col sm:flex-row min-h-screen overflow-hidden font-['Readex_Pro']">
       <div className="w-full lg:w-3/5 flex flex-col items-center justify-center px-6 sm:px-10 h-screen">
         {/* <LockImage className="w-[100px] sm:w-[133.82px] h-[100px] sm:h-[133px] mb-4" /> */}
 
-        <h2 className="text-2xl sm:text-3xl font-bold text-green-500 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#548B51] text-center">
           WELL DONE!
         </h2>
         <p className="text-gray-600 text-center mt-2 w-74">
@@ -18,7 +17,10 @@ export default function ResetSuccessfully() {
         </p>
 
         <Link to="/">
-          <button className="bg-green-500 text-white px-6 py-3 rounded-lg text-lg font-semibold mt-6 cursor-pointer">
+          <button
+            className=" text-white px-6 py-3 rounded-lg text-lg font-semibold mt-6 cursor-pointer"
+            style={{ backgroundColor: "#548B51" }}
+          >
             Sign In to Continue
           </button>
         </Link>
