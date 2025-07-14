@@ -25,30 +25,30 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white text-green-600 p-4 shadow-md fixed top-0 w-full z-50 md:justify-between">
+    <header className="bg-white text-[#548B51] p-4 shadow-md fixed top-0 w-full z-50 md:justify-between font-[Readex_Pro]">
       <div className="container mx-auto flex items-center justify-between px-4">
-        <div className="text-2xl font-bold cursor-pointer">QuestAire</div>
+        <div className="text-2xl font-bold cursor-pointer text-[#548B51]">QuestAire</div>
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex space-x-6 items-center text-black text-base lg:text-lg">
           <a
             href="#Introduction"
-            className="hover:text-green-500 cursor-pointer"
+            className="hover:text-[#548B51] cursor-pointer"
           >
             Introduction
           </a>
-          <a href="#KeyFeatures" className="hover:text-green-500 cursor-pointer">
+          <a href="#KeyFeatures" className="hover:text-[#548B51] cursor-pointer">
             Key Features
           </a>
           <a
             href="#how-it-works"
-            className="hover:text-green-500 cursor-pointer"
+            className="hover:text-[#548B51] cursor-pointer"
           >
             How It Works
           </a>
           <span
             onClick={() => navigate("/questionnaire")}
-            className="hover:text-green-500 cursor-pointer"
+            className="hover:text-[#548B51] cursor-pointer"
           >
             Questionnaire
           </span>
@@ -58,14 +58,16 @@ const Header = () => {
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 cursor-pointer"
+              className=" text-white px-4 py-1 rounded hover:brightness-90 cursor-pointer"
+            style={{ backgroundColor: "#C40000" }}
             >
               Logout
             </button>
           ) : (
             <button
               onClick={handleLogin}
-              className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 cursor-pointer"
+              className=" text-white px-4 py-1 rounded cursor-pointer hover:brightness-90"
+              style={{ backgroundColor: "#548B51" }}
             >
               Login
             </button>
@@ -112,7 +114,8 @@ const Header = () => {
           ) : (
             <button
               onClick={handleLogin}
-              className="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 cursor-pointer"
+              className="w-full text-white px-4 py-2 rounded cursor-pointer hover:brightness-90"
+              style={{ backgroundColor: "#548B51" }}
             >
               Login
             </button>
