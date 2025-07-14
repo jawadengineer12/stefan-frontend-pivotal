@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import API_BASE_URL from "../../../constants/config";
-import Select from "react-select";
 
 const CompanyManagement = () => {
   const [companies, setCompanies] = useState([]);
@@ -66,9 +65,13 @@ const CompanyManagement = () => {
     if (!editCompanyName.trim()) return alert("Company name required");
     try {
       setSaving(true);
-      await axios.put(`${API_BASE_URL}/admin/update-company/${id}`, editCompanyName, {
-        headers: { "Content-Type": "application/json" },
-      });
+      await axios.put(
+        `${API_BASE_URL}/admin/update-company/${id}`,
+        editCompanyName,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       setEditCompanyId(null);
       fetchCompanies();
     } catch (err) {
@@ -80,8 +83,13 @@ const CompanyManagement = () => {
   };
 
   return (
-    <div className="py-10 px-4 max-w-4xl mx-auto w-full font-['Readex']">
-      <h2 className="font-['Montserrat'] text-2xl font-bold mb-6 text-center md:text-left">Manage Companies</h2>
+    <div className="py-10 px-4 max-w-4xl mx-auto w-full font-['Readex_Pro']">
+      <h2
+        className="text-2xl font-bold mb-6 text-center md:text-left"
+        style={{ fontFamily: "Montserrat", fontWeight: 600 }}
+      >
+        Manage Companies
+      </h2>
 
       <div className="mb-6 flex flex-col sm:flex-row gap-4 bg-green-50">
         <input
@@ -93,9 +101,8 @@ const CompanyManagement = () => {
         <button
           onClick={handleAddCompany}
           disabled={saving}
-          className={`px-6 py-2 rounded text-white cursor-pointer ${
-            saving ? "bg-green-300" : "bg-green-600 hover:bg-green-700"
-          }`}
+          className="px-6 py-2 rounded text-white cursor-pointer"
+          style={{ backgroundColor: saving ? "#AFC8AF" : "#548B51" }}
         >
           {saving ? "Saving..." : "+ Add Company"}
         </button>
@@ -119,10 +126,9 @@ const CompanyManagement = () => {
                   />
                   <button
                     onClick={() => handleUpdateCompany(company.id)}
-                    className={`px-4 py-2 rounded text-white cursor-pointer ${
-                      saving ? "bg-green-300" : "bg-green-600 hover:bg-green-700"
-                    }`}
+                    className="px-4 py-2 rounded text-white cursor-pointer"
                     disabled={saving}
+                    style={{ backgroundColor: saving ? "#AFC8AF" : "#548B51" }}
                   >
                     {saving ? "Saving..." : "Save"}
                   </button>
@@ -136,16 +142,19 @@ const CompanyManagement = () => {
                         setEditCompanyId(company.id);
                         setEditCompanyName(company.name);
                       }}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 rounded cursor-pointer"
+                      className=" hover:brightness-90 text-white px-4 py-1 rounded cursor-pointer"
+                      style={{ backgroundColor: "#D4A52C" }}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteCompany(company.id)}
-                      className={`px-4 py-1 rounded text-white cursor-pointer ${
-                        deleting === company.id ? "bg-red-300" : "bg-red-600 hover:bg-red-700"
-                      }`}
+                      className="px-4 py-1 rounded text-white cursor-pointer"
                       disabled={deleting === company.id}
+                      style={{
+                        backgroundColor:
+                          deleting === company.id ? "#F19999" : "#C40000",
+                      }}
                     >
                       {deleting === company.id ? "Deleting..." : "Delete"}
                     </button>
