@@ -1,12 +1,15 @@
 import React from "react";
 import img1 from "../../assets/insights.svg";
+import WaveLine from "../components/waveline"; 
 
 const KeyFeature = () => {
   return (
-    <section id="KeyFeatures" className="bg-white py-20 w-full">
+    <section id="KeyFeatures" className="relative bg-white py-20 w-full">
 
-      <div className="w-full max-w-screen-xl mx-auto px-4 text-center">
-        <h2 className="text-4xl font-bold text-black">Key Features</h2>
+      <div className="w-full max-w-screen-xl mx-auto px-4 text-center font-[Readex_Pro]"
+      >
+        <h2 className="text-4xl font-bold text-black"style={{ fontFamily: "Montserrat", fontWeight: 600 }}
+        >Key Features</h2>
         <p className="mt-4 text-lg text-gray-600">
           Our comprehensive solution combines powerful tools for data collection, analysis, and AI-driven feedbacks.
         </p>
@@ -26,7 +29,7 @@ const KeyFeature = () => {
               desc: "Your data is protected with top-tier security standards and encrypted infrastructure."
             }
           ].map((feature, index) => (
-            <div key={index} className="p-6 bg-blue-100 rounded-lg shadow-xl flex flex-col items-start">
+            <div key={index} className="p-6 rounded-lg  flex flex-col items-start">
               <div className="flex justify-start items-start mb-4 w-[50px] h-[50px] p-2">
                 <img src={img1} alt={feature.title} className="w-full h-full object-contain" />
               </div>
@@ -35,6 +38,9 @@ const KeyFeature = () => {
             </div>
           ))}
         </div>
+      </div>
+      <div className="absolute bottom-0 left-0 right-0">
+        <WaveLine />
       </div>
     </section>
   );
