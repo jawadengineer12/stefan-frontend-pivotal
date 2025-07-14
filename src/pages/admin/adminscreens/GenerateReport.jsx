@@ -1,4 +1,3 @@
-import React from "react";
 import axios from "axios";
 import API_BASE_URL from "../../../constants/config";
 
@@ -21,11 +20,14 @@ const GenerateReport = () => {
   };
 
   return (
-    <div className="p-6 text-black mt-16 md:mt-6 font-['Readex']">
-      <h2 className="font-['Montserrat'] text-xl font-bold mb-4">Generate Feedback Report</h2>
+    <div className="p-6 text-black mt-16 md:mt-6 font-['Readex_Pro']">
+      <h2 className="text-xl font-bold mb-4"style={{ fontFamily: "Montserrat", fontWeight: 600 }}>
+        Generate Feedback Report
+      </h2>
       <button
         onClick={handleGenerate}
-        className="bg-green-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-green-700 "
+        className=" text-white px-4 py-2 rounded cursor-pointer"
+        style={{ backgroundColor: '#548B51' }}
       >
         Download Report
       </button>
