@@ -57,7 +57,7 @@ const CreateSectionWithQuestions = () => {
           onChange={(e) => setCurrentSection({ ...currentSection, title: e.target.value })}
           className="border p-2 w-full mb-2"
         />
-        <button onClick={handleAddSection} className="bg-green-600 text-white px-4 py-2 rounded">
+        <button onClick={handleAddSection} className=" text-white px-4 py-2 rounded"style={{ backgroundColor: "#548B51" }}>
           + Add Section
         </button>
       </div>
@@ -83,14 +83,15 @@ const CreateSectionWithQuestions = () => {
           ))}
           <button
             onClick={() => handleAddQuestion(sIndex)}
-            className="text-sm bg-green-500 text-white px-3 py-1 rounded"
+            className="text-sm text-white px-3 py-1 rounded hover:brightness-90"
+            style={{ backgroundColor: "#548B51" }}
           >
             + Add Question to {section.label}
           </button>
         </div>
       ))}
 
-      <button onClick={handleSubmit} className="bg-green-600 text-white px-6 py-2 rounded">
+      <button onClick={handleSubmit} className=" text-white px-6 py-2 rounded"style={{ backgroundColor: "#548B51" }}>
         Submit All
       </button>
     </div>
