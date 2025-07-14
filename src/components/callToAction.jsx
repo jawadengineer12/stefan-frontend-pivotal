@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import WaveLine from "./waveline";
+import WaveLine from "./Waveline";
 
 const CallToAction = () => {
   const navigate = useNavigate();
