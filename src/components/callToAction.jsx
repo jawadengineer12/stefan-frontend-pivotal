@@ -29,7 +29,7 @@ const CallToAction = () => {
         </button>
       </div>
 
-      {/* Bottom wave */}
+     
       <div className="w-full">
         <WaveLine flip />
       </div>
