@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import AuthImage from "../../components/authImage/AUTHImage";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { signup } from "../../api/auth";
-import { FiEye, FiEyeOff } from "react-icons/fi";
-import axios from "axios";
+import AuthImage from "../../components/authImage/AUTHImage";
 import API_BASE_URL from "../../constants/config";
 
 const isValidEmail = (email) => {
@@ -12,7 +12,8 @@ const isValidEmail = (email) => {
 };
 
 const isStrongPassword = (password) => {
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/;
+  const strongPasswordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/;
   return strongPasswordRegex.test(password);
 };
 
@@ -49,7 +50,8 @@ export default function SignUp() {
   const handleSignup = async () => {
     if (!name.trim()) return alert("Name is required");
     if (!email.trim()) return alert("Email is required");
-    if (!isValidEmail(email)) return alert("Please enter a valid email address");
+    if (!isValidEmail(email))
+      return alert("Please enter a valid email address");
     if (!companyName.trim()) return alert("Company name is required");
     if (!password) return alert("Password is required");
     if (!isStrongPassword(password))
@@ -59,9 +61,7 @@ export default function SignUp() {
     if (!confirmPassword) return alert("Please confirm your password");
     if (password !== confirmPassword) return alert("Passwords do not match");
 
-    const matchedCompany = companies.find(
-      (c) => c.name === companyName.trim()
-    );
+    const matchedCompany = companies.find((c) => c.name === companyName.trim());
     if (!matchedCompany) {
       return alert("Company does not exist. Please choose a valid company.");
     }
@@ -87,7 +87,7 @@ export default function SignUp() {
     const matches = companies.filter((c) =>
       c.name.toLowerCase().includes(value.toLowerCase())
     );
-    setCompanySuggestions(matches.slice(0, 10)); 
+    setCompanySuggestions(matches.slice(0, 10));
   };
 
   if (loading) {
@@ -107,24 +107,28 @@ export default function SignUp() {
           handleSignup();
         }}
       >
-        <h2 className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-center text-black mb-2">
+        <h2 className=" text-2xl sm:text-3xl font-bold text-center text-black mb-2"style={{ fontFamily: "Montserrat", fontWeight: 600 }}>
           Sign Up for an Account
         </h2>
-        <p className="font-['Readex'] text-center text-gray-600 mb-3 text-sm">
+        <p className="font-['Readex_Pro'] text-center text-gray-600 mb-3 text-sm">
           Please enter details to create your account
         </p>
 
-        <label className="text-sm font-medium text-gray-700 mb-1 font-['Readex']">Name</label>
+        <label className="text-sm font-medium text-gray-700 mb-1 font-['Readex_Pro']">
+          Name
+        </label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Enter your name"
-          className="font-['Readex'] w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 bg-green-50"
+          className="font-['Readex_Pro'] w-full mb-4 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 bg-green-50"
           required
         />
 
-        <label className="font-['Readex'] text-sm font-medium text-gray-700 mb-1">Email</label>
+        <label className="font-['Readex_Pro'] text-sm font-medium text-gray-700 mb-1">
+          Email
+        </label>
         <input
           type="email"
           value={email}
@@ -134,13 +138,15 @@ export default function SignUp() {
           required
         />
 
-        <label className="font-['Readex'] text-sm font-medium text-gray-700 mb-1">Enter Company ID</label>
+        <label className="font-['Readex_Pro'] text-sm font-medium text-gray-700 mb-1">
+          Enter Company ID
+        </label>
         <input
           type="text"
           value={companyName}
           onChange={(e) => handleCompanyInput(e.target.value)}
           placeholder="Type company name"
-          className="font-['Readex'] w-full mb-1 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 bg-green-50"
+          className="font-['Readex_Pro'] w-full mb-1 p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 bg-green-50"
           required
         />
         {companyName.trim() !== "" && companySuggestions.length > 0 && (
@@ -152,7 +158,7 @@ export default function SignUp() {
                   setCompanyName(c.name);
                   setCompanySuggestions([]);
                 }}
-                className="font-['Readex'] px-4 py-2 text-sm text-black hover:bg-gray-100 cursor-pointer"
+                className="font-['Readex_Pro'] px-4 py-2 text-sm text-black hover:bg-gray-100 cursor-pointer"
               >
                 {c.name}
               </li>
@@ -160,14 +166,16 @@ export default function SignUp() {
           </ul>
         )}
 
-        <label className="font-['Readex'] text-sm font-medium text-gray-700 mb-1">Password</label>
+        <label className="font-['Readex_Pro'] text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
         <div className="relative mb-4">
           <input
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter a strong password"
-            className="font-['Readex'] w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10 bg-green-50"
+            className="font-['Readex_Pro'] w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10 bg-green-50"
             required
           />
           <button
@@ -179,14 +187,16 @@ export default function SignUp() {
           </button>
         </div>
 
-        <label className="font-['Readex'] text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+        <label className="font-['Readex_Pro'] text-sm font-medium text-gray-700 mb-1">
+          Confirm Password
+        </label>
         <div className="relative mb-6">
           <input
             type={showConfirmPassword ? "text" : "password"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Re-enter your password"
-            className="font-['Readex'] w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10 bg-green-50"
+            className="font-['Readex_Pro'] w-full p-3 border border-gray-300 rounded-md text-black placeholder-gray-500 pr-10 bg-green-50"
             required
           />
           <button
@@ -197,19 +207,20 @@ export default function SignUp() {
             {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
           </button>
         </div>
-        <p className="font-['Readex'] text-xs text-gray-500 mb-3 mt-[-17px]">
-  Password must be at least 12 characters long and include uppercase, lowercase, number, and special character.
+        <p className="font-['Readex_Pro'] text-xs text-gray-500 mb-3 mt-[-17px]">
+          Password must be at least 12 characters long and include uppercase,
+          lowercase, number, and special character.
         </p>
-
 
         <button
           type="submit"
-          className="font-['Readex'] w-full bg-green-600 text-white py-3 rounded-md text-lg font-semibold hover:bg-green-700 transition cursor-pointer"
+          className="font-['Readex_Pro'] w-full text-white py-3 rounded-md text-lg font-semibold  transition cursor-pointer"
+          style={{ backgroundColor: "#548B51" }}
           disabled={signingUp}
         >
           {signingUp ? (
             <div className="flex items-center justify-center">
-              <div className="font-['Readex']w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+              <div className="font-['Readex_Pro']w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
               Signing Up...
             </div>
           ) : (
@@ -219,15 +230,17 @@ export default function SignUp() {
 
         <div className="flex justify-center items-center my-4">
           <hr className="flex-grow border-gray-300" />
-          <span className="px-2 text-gray-500 text-sm font-['Readex']">OR</span>
+          <span className="px-2 text-gray-500 text-sm font-['Readex_Pro']">
+            OR
+          </span>
           <hr className="flex-grow border-gray-300" />
         </div>
 
-        <p className="text-center text-sm text-gray-600 font-['Readex']">
+        <p className="text-center text-sm text-gray-600 font-['Readex_Pro']">
           Already have an account?{" "}
           <Link
             to="/login"
-            className="text-green-600 font-semibold hover:underline cursor-pointer font-['Readex']"
+            className="text-[#548B51] font-semibold hover:underline cursor-pointer font-['Readex_Pro']"
           >
             Login
           </Link>
