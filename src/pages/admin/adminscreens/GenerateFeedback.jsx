@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import Select from "react-select";
 import API_BASE_URL from "../../../constants/config";
 
@@ -72,8 +72,8 @@ const GenerateFeedback = () => {
   };
 
   return (
-    <div className="p-6 text-black mt-16 md:mt-6 font-['Readex']">
-      <h2 className="text-2xl font-bold mb-4 font-['Montserrat']">
+    <div className="p-6 text-black mt-16 md:mt-6 font-['Readex_Pro']">
+      <h2 className="text-2xl font-bold mb-4"style={{ fontFamily: "Montserrat", fontWeight: 600 }}>
         Generate Feedback Summary for a Company
       </h2>
 
@@ -92,7 +92,6 @@ const GenerateFeedback = () => {
               borderRadius: 6,
               borderColor: "#D1D5DB",
               boxShadow: "none",
-              
             }),
             option: (base, { isFocused }) => ({
               ...base,
@@ -121,7 +120,8 @@ const GenerateFeedback = () => {
       <div className="flex gap-4 mb-6 items-center">
         <button
           onClick={handleGenerateCompanyReport}
-          className="bg-green-600 text-white px-6 py-2 rounded cursor-pointer hover:bg-green-700 disabled:opacity-50"
+          className=" text-white px-6 py-2 rounded cursor-pointer disabled:opacity-50"
+          style={{ backgroundColor: '#548B51' }}
           disabled={loadingReport}
         >
           {loadingReport ? "Generating..." : "Generate Feedback"}
@@ -143,8 +143,12 @@ const GenerateFeedback = () => {
 
       {report && (
         <div className="mt-6 border border-gray-300 rounded p-4 bg-green-50">
-          <h3 className="text-lg font-semibold mb-2">Company: {report.company}</h3>
-          <p className="font-semibold">Average Rating: {report.average_rating}</p>
+          <h3 className="text-lg font-semibold mb-2">
+            Company: {report.company}
+          </h3>
+          <p className="font-semibold">
+            Average Rating: {report.average_rating}
+          </p>
 
           <div className="mt-4 whitespace-pre-wrap">
             <h4 className="font-semibold mb-1">Summary:</h4>
