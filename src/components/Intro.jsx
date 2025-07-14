@@ -45,6 +45,7 @@ const Intro = () => {
           Get actionable insights and improve decision-making.
         </p>
       </div>
+      
        <div className="absolute bottom-0 left-0 right-0">
         <WaveLine />
       </div>
