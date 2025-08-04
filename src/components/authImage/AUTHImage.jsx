@@ -4,23 +4,28 @@ import content from "../../constants/content";
 
 export default function AuthImage() {
   const descriptions = [content.appDescription];
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex] = useState(0);
 
   return (
-    <div
-      className="flex relative w-[450PX] h-full items-center justify-center bg-white sm:hidden md:flex"
-      style={{ backgroundImage: `url(${authimage})`, backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center" }}
-    >
-      {/* Overlay container for app name and description */}
-      <div className="absolute top-10 left-1/2 transform -translate-x-1/2 text-center w-full px-4">
-        <h2 className="font-semibold text-xl text-black"
-        style={{ fontFamily: "Montserrat", fontWeight: 600 }}>
+    <div className="w-full flex flex-col items-center justify-center p-6 bg-white sm:hidden md:flex">
+   
+      <div className="text-center mb-4">
+        <h2
+          className="font-semibold text-xl text-black"
+          style={{ fontFamily: "Montserrat", fontWeight: 600 }}
+        >
           {content.appName}
         </h2>
-        <p className="font-['Readex_Pro'] mt-2 text-black text-sm max-w-md mx-auto ">
+        <p className="font-['Readex_Pro'] mt-2 text-black text-sm max-w-md mx-auto">
           {descriptions[currentIndex]}
         </p>
       </div>
+      <img
+        src={authimage}
+        alt="Auth Illustration"
+        className="w-full max-w-[450px] h-auto object-contain"
+      />
     </div>
+    
   );
 }
