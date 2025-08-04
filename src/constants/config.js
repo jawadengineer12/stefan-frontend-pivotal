@@ -1,3 +1,4 @@
-const API_BASE_URL = "https://stephn-backend-jaffars-projects-118ed8de.vercel.app";
+const API_BASE_URL = "https://api.pivotal.ag";
 
 export default API_BASE_URL;
+
