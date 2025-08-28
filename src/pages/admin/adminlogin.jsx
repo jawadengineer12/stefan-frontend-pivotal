@@ -23,10 +23,16 @@ export default function AdminLogin() {
         email,
         password,
       });
-
+      if (response.status !== 200) {
+        throw new Error("Login failed");
+      }
+      else{
+        navigate("/admin/dashboard");
+      }
       // Redirect on success
       navigate("/admin/dashboard");
-    } catch (err) {
+    } 
+    catch (err) {
       const message =
         err.response?.data?.detail || "Login failed. Please try again.";
       setError(message);
