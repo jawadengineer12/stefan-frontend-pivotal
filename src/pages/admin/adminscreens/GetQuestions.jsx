@@ -202,7 +202,6 @@ const GetQuestions = () => {
           Export .CSV
         </button>
       </div>
-
       {loading ? (
         <div className="text-center text-gray-600">Loading questions...</div>
       ) : (
@@ -244,7 +243,7 @@ const GetQuestions = () => {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="font-medium">
-                              Q{qIndex + 1}: {q.question}
+                              {q.question}
                             </p>
                             <p className="text-sm text-gray-600">
                               Answered by {q.answers?.length || 0} user(s)
