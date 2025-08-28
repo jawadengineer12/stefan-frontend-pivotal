@@ -30,32 +30,31 @@ const Questionnaire = () => {
 
         localStorage.setItem("questionnaire_owner_email", user_email);
 
-        const stored = JSON.parse(localStorage.getItem("questionnaireData")) || [];
+        const stored =
+          JSON.parse(localStorage.getItem("questionnaireData")) || [];
 
-   const merged = fetchedSections
-  .sort((a, b) => a.label.localeCompare(b.label)) // Sort sections alphabetically
-  .map((section) => ({
-    ...section,
-    questions: section.questions
-      .map((q) => {
-        const local = stored.find((s) => s.question_id === q.question_id);
-        return {
-          ...q,
-          rating: local?.rating ?? q.rating ?? 0,
-          feedback: local?.feedback ?? q.feedback ?? "",
-          cantAnswer: local?.cantAnswer ?? false,
-          rating_3_text: q.rating_3_text || "",
-          rating_neg3_text: q.rating_neg3_text || "",
-        };
-      })
-      .sort((a, b) => {
-        // Extract numeric part from question like "L1", "L2", etc.
-        const numA = parseInt(a.question.match(/\d+/)?.[0] || 0);
-        const numB = parseInt(b.question.match(/\d+/)?.[0] || 0);
-        return numA - numB;
-      }),
-  }));
-
+        const merged = fetchedSections
+          .sort((a, b) => a.label.localeCompare(b.label))
+          .map((section) => ({
+            ...section,
+            questions: section.questions
+              .map((q) => {
+                const local = stored.find((s) => s.question_id === q.question_id);
+                return {
+                  ...q,
+                  rating: local?.rating ?? q.rating ?? 0,
+                  feedback: local?.feedback ?? q.feedback ?? "",
+                  cantAnswer: local?.cantAnswer ?? false,
+                  rating_3_text: q.rating_3_text || "",
+                  rating_neg3_text: q.rating_neg3_text || "",
+                };
+              })
+              .sort((a, b) => {
+                const numA = parseInt(a.question.match(/\d+/)?.[0] || 0);
+                const numB = parseInt(b.question.match(/\d+/)?.[0] || 0);
+                return numA - numB;
+              }),
+          }));
 
         setSections(merged);
       } catch (err) {
@@ -66,6 +65,7 @@ const Questionnaire = () => {
     fetchQuestions();
   }, []);
 
+  // Save to localStorage
   const autoSave = (updatedSections) => {
     const allAnswers = updatedSections.flatMap((section) =>
       section.questions.map((q) => ({
@@ -78,18 +78,47 @@ const Questionnaire = () => {
     localStorage.setItem("questionnaireData", JSON.stringify(allAnswers));
   };
 
+  // 🔹 NEW: Save one question to backend
+  const saveSingleAnswer = async (question) => {
+    try {
+      await axios.post(
+        `${API_BASE_URL}/user/submit-answer/`,
+        [
+          {
+            question_id: question.question_id,
+            answer: question.cantAnswer ? "" : question.feedback,
+            rating: question.cantAnswer ? 0 : question.rating,
+            submitted_at: new Date().toISOString(),
+          },
+        ],
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } catch (err) {
+      console.error("Autosave error:", err);
+    }
+  };
+
   const handleRatingChange = (sIndex, qIndex, value) => {
     const updated = [...sections];
-    updated[sIndex].questions[qIndex].rating = value;
+    const question = updated[sIndex].questions[qIndex];
+    question.rating = value;
     setSections(updated);
     autoSave(updated);
+    saveSingleAnswer(question); // 🔹 Send this question to backend
   };
 
   const handleFeedbackChange = (sIndex, qIndex, value) => {
     const updated = [...sections];
-    updated[sIndex].questions[qIndex].feedback = value;
+    const question = updated[sIndex].questions[qIndex];
+    question.feedback = value;
     setSections(updated);
     autoSave(updated);
+    saveSingleAnswer(question); // 🔹 Send this question to backend
   };
 
   const handleCantAnswerToggle = (sIndex, qIndex) => {
@@ -104,6 +133,7 @@ const Questionnaire = () => {
 
     setSections(updated);
     autoSave(updated);
+    saveSingleAnswer(question); // 🔹 Send this question to backend
   };
 
   const getSliderThumbColor = (rating) => {
@@ -121,34 +151,31 @@ const Questionnaire = () => {
     setSubmitting(true);
 
     try {
-      for (const section of sections) {
-        for (const q of section.questions) {
-          await axios.post(
-            `${API_BASE_URL}/user/submit-answer/${q.question_id}/`,
-            {
-              answer: q.feedback,
-              rating: q.rating,
-              cant_answer: q.cantAnswer,
-              submitted_at: new Date().toISOString(),
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-        }
-      }
+      const allAnswers = sections.flatMap((section) =>
+        section.questions.map((q) => ({
+          question_id: q.question_id,
+          answer: q.cantAnswer ? "" : q.feedback,
+          rating: q.cantAnswer ? 0 : q.rating,
+          submitted_at: new Date().toISOString(),
+        }))
+      );
+
+      await axios.post(`${API_BASE_URL}/user/submit-answer/`, allAnswers, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       setSubmitted(true);
 
       const companyId = localStorage.getItem("company_id");
       if (companyId) {
-        const summaryRes = await axios.get(`${API_BASE_URL}/generate-feedback-by-company/${companyId}`);
+        const summaryRes = await axios.get(
+          `${API_BASE_URL}/generate-feedback-by-company/${companyId}`
+        );
         setSummary(summaryRes.data.summary);
       }
-
     } catch (err) {
       console.error("Error submitting answers:", err);
       alert("Failed to submit answers.");
@@ -162,14 +189,19 @@ const Questionnaire = () => {
       const trimmed = line.trim();
 
       if (trimmed.startsWith("### ")) {
-        return <h3 key={index} className="text-lg font-bold mt-4">{trimmed.replace("### ", "")}</h3>;
+        return (
+          <h3 key={index} className="text-lg font-bold mt-4">
+            {trimmed.replace("### ", "")}
+          </h3>
+        );
       }
 
       if (/^\*\*(.+)\*\*:/.test(trimmed)) {
         const parts = trimmed.split("**").filter(Boolean);
         return (
           <p key={index} className="mt-2">
-            <span className="font-semibold">{parts[0]}:</span> {parts.slice(1).join("")}
+            <span className="font-semibold">{parts[0]}:</span>{" "}
+            {parts.slice(1).join("")}
           </p>
         );
       }
@@ -184,44 +216,69 @@ const Questionnaire = () => {
 
       if (/^-\s/.test(trimmed)) {
         return (
-          <li key={index} className="ml-8 list-disc text-sm">{trimmed.replace(/^-/, "").trim()}</li>
+          <li key={index} className="ml-8 list-disc text-sm">
+            {trimmed.replace(/^-/, "").trim()}
+          </li>
         );
       }
 
       return (
-        <p key={index} className="text-sm text-gray-800">{trimmed}</p>
+        <p key={index} className="text-sm text-gray-800">
+          {trimmed}
+        </p>
       );
     });
   };
 
   return (
-    <section className="py-20 px-6 flex flex-col  min-h-screen font-[Readex_Pro]"
-    style={{ backgroundColor: "#E8E6DC" }}
+    <section
+      className="py-20 px-6 flex flex-col  min-h-screen font-[Readex_Pro]"
+      style={{ backgroundColor: "#E8E6DC" }}
     >
       <div className="container mx-auto max-w-4xl">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 "style={{ fontFamily: "Montserrat", fontWeight: 600 }}>Questions</h2>
-        <p className="text-gray-600 text-center mb-8">Your ratings and answers are saved step by step. You can always return to the answers and adjust them later.</p>
+        <h2
+          className="text-3xl font-bold text-center text-gray-800 mb-8 "
+          style={{ fontFamily: "Montserrat", fontWeight: 600 }}
+        >
+          Questions
+        </h2>
+        <p className="text-gray-600 text-center mb-8">
+          Your ratings and answers are saved step by step. You can always return
+          to the answers and adjust them later.
+        </p>
 
         {submitted && (
           <div className="text-center bg-white p-10 rounded shadow mb-8">
-            <h3 className="text-2xl font-semibold text-[#548B51] mb-4">Thank you!</h3>
+            <h3 className="text-2xl font-semibold text-[#548B51] mb-4">
+              Thank you!
+            </h3>
             <p className="text-gray-700">
-              Your feedback has been submitted successfully. You may continue editing your answers if needed.
+              Your feedback has been submitted successfully. You may continue
+              editing your answers if needed.
             </p>
           </div>
         )}
 
         {sections.map((section, sIndex) => (
-          <div key={sIndex} className="mb-10 bg-white rounded-lg shadow-md overflow-hidden">
+          <div
+            key={sIndex}
+            className="mb-10 bg-white rounded-lg shadow-md overflow-hidden"
+          >
             <div
               className="flex justify-between items-center px-6 py-4 cursor-pointer"
               style={{ backgroundColor: "#548B51" }}
-              onClick={() => setExpandedSection(expandedSection === section.label ? null : section.label)}
+              onClick={() =>
+                setExpandedSection(
+                  expandedSection === section.label ? null : section.label
+                )
+              }
             >
               <h3 className="text-xl font-bold text-white ">
                 Section {section.label}: {section.title}
               </h3>
-              <span className="text-2xl font-bold text-gray-600">{expandedSection === section.label ? "−" : "+"}</span>
+              <span className="text-2xl font-bold text-gray-600">
+                {expandedSection === section.label ? "−" : "+"}
+              </span>
             </div>
 
             <AnimatePresence>
@@ -234,27 +291,31 @@ const Questionnaire = () => {
                   transition={{ duration: 0.3 }}
                 >
                   {section.questions.map((question, qIndex) => (
-                    <div key={question.question_id} className=" border border-gray-200 rounded-lg p-6 mb-6">
-                      <p className="text-lg font-medium text-gray-800 mb-4">{question.question}</p>
+                    <div
+                      key={question.question_id}
+                      className=" border border-gray-200 rounded-lg p-6 mb-6"
+                    >
+                      <p className="text-lg font-medium text-gray-800 mb-4">
+                        {question.question}
+                      </p>
 
                       <div className="mb-4">
-<label className="text-sm text-gray-800 flex items-center gap-2 mb-2 cursor-pointer">
-  <div className="relative">
-    <input
-      type="checkbox"
-      checked={question.cantAnswer}
-      onChange={() => handleCantAnswerToggle(sIndex, qIndex)}
-      className="peer appearance-none h-4 w-4 border border-gray-400 rounded bg-transparent cursor-pointer checked:bg-transparent"
-    />
-    {/* Tick ✔ shown only when checked */}
-    <span className="absolute top-0 left-0 h-4 w-4 flex items-center justify-center text-xs font-bold text-black peer-checked:opacity-100 opacity-0 pointer-events-none">
-      ✔
-    </span>
-  </div>
-  I can’t answer this question
-</label>
-
-
+                        <label className="text-sm text-gray-800 flex items-center gap-2 mb-2 cursor-pointer">
+                          <div className="relative">
+                            <input
+                              type="checkbox"
+                              checked={question.cantAnswer}
+                              onChange={() =>
+                                handleCantAnswerToggle(sIndex, qIndex)
+                              }
+                              className="peer appearance-none h-4 w-4 border border-gray-400 rounded bg-transparent cursor-pointer checked:bg-transparent"
+                            />
+                            <span className="absolute top-0 left-0 h-4 w-4 flex items-center justify-center text-xs font-bold text-black peer-checked:opacity-100 opacity-0 pointer-events-none">
+                              ✔
+                            </span>
+                          </div>
+                          I can’t answer this question
+                        </label>
                       </div>
 
                       <div className="mb-6">
@@ -265,9 +326,17 @@ const Questionnaire = () => {
                           step="1"
                           value={question.rating}
                           disabled={question.cantAnswer}
-                          onChange={(e) => handleRatingChange(sIndex, qIndex, parseInt(e.target.value))}
-                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${getSliderThumbColor(question.rating)} bg-gray-300`}
-                          style={{ WebkitAppearance: 'none' }}
+                          onChange={(e) =>
+                            handleRatingChange(
+                              sIndex,
+                              qIndex,
+                              parseInt(e.target.value)
+                            )
+                          }
+                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${getSliderThumbColor(
+                            question.rating
+                          )} bg-gray-300`}
+                          style={{ WebkitAppearance: "none" }}
                         />
                         <div className="flex justify-between text-xs text-gray-700 mt-1 px-[2px]">
                           <span className="text-red-600">-3</span>
@@ -293,7 +362,9 @@ const Questionnaire = () => {
                         placeholder="Please explain your rating..."
                         value={question.feedback}
                         disabled={question.cantAnswer}
-                        onChange={(e) => handleFeedbackChange(sIndex, qIndex, e.target.value)}
+                        onChange={(e) =>
+                          handleFeedbackChange(sIndex, qIndex, e.target.value)
+                        }
                         className="w-full mt-4 p-4 text-black rounded-md border border-gray-300  cursor-pointer bg-green-50"
                         rows="3"
                       ></textarea>
@@ -309,8 +380,9 @@ const Questionnaire = () => {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-          
-            className={` text-white px-8 py-3 rounded-lg hover:brightness-90 mt-6 font-semibold cursor-pointer ${submitting ? "opacity-50" : ""}`}
+            className={` text-white px-8 py-3 rounded-lg hover:brightness-90 mt-6 font-semibold cursor-pointer ${
+              submitting ? "opacity-50" : ""
+            }`}
             style={{ backgroundColor: "#548B51" }}
           >
             {submitting ? "Submitting..." : "Submit Feedback"}
