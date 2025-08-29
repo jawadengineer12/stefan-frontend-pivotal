@@ -109,7 +109,7 @@ const Questionnaire = () => {
     question.rating = value;
     setSections(updated);
     autoSave(updated);
-    saveSingleAnswer(question); // 🔹 Send this question to backend
+    saveSingleAnswer(question);
   };
 
   const handleFeedbackChange = (sIndex, qIndex, value) => {
