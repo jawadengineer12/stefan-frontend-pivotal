@@ -35,7 +35,7 @@ export default function SignIn() {
         localStorage.removeItem("rememberedEmail");
       }
 
-      navigate("/home");
+      navigate("/questionnaire");
     } catch (err) {
       const message = err.response?.data?.detail;
       if (message === "Invalid email or password") {
