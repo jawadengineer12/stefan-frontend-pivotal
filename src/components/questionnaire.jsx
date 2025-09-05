@@ -21,34 +21,21 @@ const Questionnaire = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const { user_email, sections: fetchedSections } = response.data;
-        const storedEmail = localStorage.getItem("questionnaire_owner_email");
-
-        if (storedEmail && storedEmail !== user_email) {
-          localStorage.removeItem("questionnaireData");
-        }
-
-        localStorage.setItem("questionnaire_owner_email", user_email);
-
-        const stored =
-          JSON.parse(localStorage.getItem("questionnaireData")) || [];
+        const { sections: fetchedSections } = response.data;
 
         const merged = fetchedSections
           .sort((a, b) => a.label.localeCompare(b.label))
           .map((section) => ({
             ...section,
             questions: section.questions
-              .map((q) => {
-                const local = stored.find((s) => s.question_id === q.question_id);
-                return {
-                  ...q,
-                  rating: local?.rating ?? q.rating ?? 0,
-                  feedback: local?.feedback ?? q.feedback ?? "",
-                  cantAnswer: local?.cantAnswer ?? false,
-                  rating_3_text: q.rating_3_text || "",
-                  rating_neg3_text: q.rating_neg3_text || "",
-                };
-              })
+              .map((q) => ({
+                ...q,
+                rating: q.rating ?? 0,
+                feedback: q.feedback ?? "",
+                cantAnswer: !q.rating && !q.feedback,
+                rating_3_text: q.rating_3_text || "",
+                rating_neg3_text: q.rating_neg3_text || "",
+              }))
               .sort((a, b) => {
                 const numA = parseInt(a.question.match(/\d+/)?.[0] || 0);
                 const numB = parseInt(b.question.match(/\d+/)?.[0] || 0);
@@ -62,23 +49,20 @@ const Questionnaire = () => {
       }
     };
 
-    fetchQuestions();
-  }, []);
+    if (token) {
+      fetchQuestions();
+    } else {
+      navigate("/login");
+    }
+  }, [token, navigate]);
 
-  // Save to localStorage
-  const autoSave = (updatedSections) => {
-    const allAnswers = updatedSections.flatMap((section) =>
-      section.questions.map((q) => ({
-        question_id: q.question_id,
-        rating: q.rating,
-        feedback: q.feedback,
-        cantAnswer: q.cantAnswer,
-      }))
+  const isSectionComplete = (section) => {
+    return section.questions.every(
+      (q) => q.cantAnswer || q.rating !== 0 || q.feedback.trim() !== ""
     );
-    localStorage.setItem("questionnaireData", JSON.stringify(allAnswers));
   };
 
-  // 🔹 NEW: Save one question to backend
+
   const saveSingleAnswer = async (question) => {
     try {
       await axios.post(
@@ -107,8 +91,8 @@ const Questionnaire = () => {
     const updated = [...sections];
     const question = updated[sIndex].questions[qIndex];
     question.rating = value;
+    question.cantAnswer = false;
     setSections(updated);
-    autoSave(updated);
     saveSingleAnswer(question);
   };
 
@@ -116,9 +100,9 @@ const Questionnaire = () => {
     const updated = [...sections];
     const question = updated[sIndex].questions[qIndex];
     question.feedback = value;
+    question.cantAnswer = false;
     setSections(updated);
-    autoSave(updated);
-    saveSingleAnswer(question); // 🔹 Send this question to backend
+    saveSingleAnswer(question);
   };
 
   const handleCantAnswerToggle = (sIndex, qIndex) => {
@@ -132,8 +116,7 @@ const Questionnaire = () => {
     }
 
     setSections(updated);
-    autoSave(updated);
-    saveSingleAnswer(question); // 🔹 Send this question to backend
+    saveSingleAnswer(question);
   };
 
   const getSliderThumbColor = (rating) => {
@@ -184,6 +167,12 @@ const Questionnaire = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("company_id");
+    navigate("/login");
+  };
+
   const formatSummary = (summary) => {
     return summary.split("\n").map((line, index) => {
       const trimmed = line.trim();
@@ -232,16 +221,25 @@ const Questionnaire = () => {
 
   return (
     <section
-      className="py-20 px-6 flex flex-col  min-h-screen font-[Readex_Pro]"
+      className="py-20 px-6 flex flex-col min-h-screen font-[Readex_Pro]"
       style={{ backgroundColor: "#E8E6DC" }}
     >
       <div className="container mx-auto max-w-4xl">
-        <h2
-          className="text-3xl font-bold text-center text-gray-800 mb-8 "
-          style={{ fontFamily: "Montserrat", fontWeight: 600 }}
-        >
-          Questions
-        </h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2
+            className="text-3xl font-bold text-gray-800"
+            style={{ fontFamily: "Montserrat", fontWeight: 600 }}
+          >
+            Questions
+          </h2>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 cursor-pointer"
+          >
+            Logout
+          </button>
+        </div>
+
         <p className="text-gray-600 text-center mb-8">
           Your ratings and answers are saved step by step. You can always return
           to the answers and adjust them later.
@@ -266,17 +264,29 @@ const Questionnaire = () => {
           >
             <div
               className="flex justify-between items-center px-6 py-4 cursor-pointer"
-              style={{ backgroundColor: "#548B51" }}
+              style={{
+                backgroundColor: isSectionComplete(section)
+                  ? "#548B51"
+                  : "#D1D5DB", // green if complete else grey
+              }}
               onClick={() =>
                 setExpandedSection(
                   expandedSection === section.label ? null : section.label
                 )
               }
             >
-              <h3 className="text-xl font-bold text-white ">
+              <h3
+                className={`text-xl font-bold ${
+                  isSectionComplete(section) ? "text-white" : "text-black"
+                }`}
+              >
                 Section {section.label}: {section.title}
               </h3>
-              <span className="text-2xl font-bold text-gray-600">
+              <span
+                className={`text-2xl font-bold ${
+                  isSectionComplete(section) ? "text-white" : "text-black"
+                }`}
+              >
                 {expandedSection === section.label ? "−" : "+"}
               </span>
             </div>
@@ -293,7 +303,7 @@ const Questionnaire = () => {
                   {section.questions.map((question, qIndex) => (
                     <div
                       key={question.question_id}
-                      className=" border border-gray-200 rounded-lg p-6 mb-6"
+                      className="border border-gray-200 rounded-lg p-6 mb-6"
                     >
                       <p className="text-lg font-medium text-gray-800 mb-4">
                         {question.question}
@@ -365,7 +375,7 @@ const Questionnaire = () => {
                         onChange={(e) =>
                           handleFeedbackChange(sIndex, qIndex, e.target.value)
                         }
-                        className="w-full mt-4 p-4 text-black rounded-md border border-gray-300  cursor-pointer bg-green-50"
+                        className="w-full mt-4 p-4 text-black rounded-md border border-gray-300 cursor-pointer bg-green-50"
                         rows="3"
                       ></textarea>
                     </div>
