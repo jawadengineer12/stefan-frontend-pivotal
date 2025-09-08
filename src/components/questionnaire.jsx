@@ -14,6 +14,7 @@ const Questionnaire = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
+  
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -30,9 +31,9 @@ const Questionnaire = () => {
             questions: section.questions
               .map((q) => ({
                 ...q,
-                rating: q.rating ?? 0,
-                feedback: q.feedback ?? "",
-                cantAnswer: !q.rating && !q.feedback,
+                rating: 0, // start empty
+                feedback: "",
+                cantAnswer: false, 
                 rating_3_text: q.rating_3_text || "",
                 rating_neg3_text: q.rating_neg3_text || "",
               }))
@@ -43,7 +44,14 @@ const Questionnaire = () => {
               }),
           }));
 
-        setSections(merged);
+        // Check localStorage for saved answers
+        const savedData = localStorage.getItem("questionnaire_answers");
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          setSections(parsed);
+        } else {
+          setSections(merged);
+        }
       } catch (err) {
         console.error("Failed to load questions:", err);
       }
@@ -56,35 +64,22 @@ const Questionnaire = () => {
     }
   }, [token, navigate]);
 
+  // 🔹 Save sections state into localStorage whenever it changes
+  useEffect(() => {
+    if (sections.length > 0) {
+      localStorage.setItem("questionnaire_answers", JSON.stringify(sections));
+    }
+  }, [sections]);
+
   const isSectionComplete = (section) => {
     return section.questions.every(
       (q) => q.cantAnswer || q.rating !== 0 || q.feedback.trim() !== ""
     );
   };
 
-
-  const saveSingleAnswer = async (question) => {
-    try {
-      await axios.post(
-        `${API_BASE_URL}/user/submit-answer/`,
-        [
-          {
-            question_id: question.question_id,
-            answer: question.cantAnswer ? "" : question.feedback,
-            rating: question.cantAnswer ? 0 : question.rating,
-            submitted_at: new Date().toISOString(),
-          },
-        ],
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    } catch (err) {
-      console.error("Autosave error:", err);
-    }
+  // 🔹 Removed API autosave → only save to localStorage now
+  const saveSingleAnswer = (question) => {
+    localStorage.setItem("questionnaire_answers", JSON.stringify(sections));
   };
 
   const handleRatingChange = (sIndex, qIndex, value) => {
@@ -152,6 +147,9 @@ const Questionnaire = () => {
 
       setSubmitted(true);
 
+      // 🔹 Clear localStorage after successful submit
+      localStorage.removeItem("questionnaire_answers");
+
       const companyId = localStorage.getItem("company_id");
       if (companyId) {
         const summaryRes = await axios.get(
@@ -170,6 +168,7 @@ const Questionnaire = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("company_id");
+    localStorage.removeItem("questionnaire_answers");
     navigate("/login");
   };
 
@@ -241,8 +240,8 @@ const Questionnaire = () => {
         </div>
 
         <p className="text-gray-600 text-center mb-8">
-          Your ratings and answers are saved step by step. You can always return
-          to the answers and adjust them later.
+          Your ratings and answers are saved step by step locally. You can
+          always return to the answers and adjust them later.
         </p>
 
         {submitted && (
