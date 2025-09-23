@@ -29,14 +29,17 @@ const Questionnaire = () => {
           .map((section) => ({
             ...section,
             questions: section.questions
-              .map((q) => ({
-                ...q,
-                rating: q.rating ?? 0,                 // use DB rating if present
-                feedback: q.answer || "",              // use DB answer if present
-                cantAnswer: q.rating === 0 && !q.answer, // mark skipped
-                rating_3_text: q.rating_3_text || "",
-                rating_neg3_text: q.rating_neg3_text || "",
-              }))
+              .map((q) => {
+               const isBlank = !q.answer || q.answer === "blank";
+                return {
+                  ...q,
+                  rating: q.rating ?? 0,
+                  feedback: isBlank ? "" : q.answer,
+                  cantAnswer: q.rating === 0 && isBlank,
+                  rating_3_text: q.rating_3_text || "",
+                  rating_neg3_text: q.rating_neg3_text || "",
+                };
+              })
 
               .sort((a, b) => {
                 const numA = parseInt(a.question.match(/\d+/)?.[0] || 0);
@@ -45,13 +48,8 @@ const Questionnaire = () => {
               }),
           }));
 
-        // Check localStorage for saved answers
-        const savedData = localStorage.getItem("questionnaire_answers");
-        if (savedData && !submitted) {
-          setSections(JSON.parse(savedData));
-        } else {
-          setSections(merged);
-        }
+        setSections(merged);
+
       } catch (err) {
         console.error("Failed to load questions:", err);
       }
@@ -64,22 +62,10 @@ const Questionnaire = () => {
     }
   }, [token, navigate]);
 
-  // 🔹 Save sections state into localStorage whenever it changes
-  useEffect(() => {
-    if (sections.length > 0) {
-      localStorage.setItem("questionnaire_answers", JSON.stringify(sections));
-    }
-  }, [sections]);
-
   const isSectionComplete = (section) => {
     return section.questions.every(
       (q) => q.cantAnswer || q.rating !== 0 || q.feedback.trim() !== ""
     );
-  };
-
-  // 🔹 Removed API autosave → only save to localStorage now
-  const saveSingleAnswer = (question) => {
-    localStorage.setItem("questionnaire_answers", JSON.stringify(sections));
   };
 
   const handleRatingChange = (sIndex, qIndex, value) => {
@@ -148,7 +134,7 @@ const Questionnaire = () => {
       setSubmitted(true);
 
       // 🔹 Clear localStorage after successful submit
-      localStorage.removeItem("questionnaire_answers");
+      
 
       const companyId = localStorage.getItem("company_id");
       if (companyId) {
@@ -168,7 +154,6 @@ const Questionnaire = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("company_id");
-    localStorage.removeItem("questionnaire_answers");
     navigate("/login");
   };
 
