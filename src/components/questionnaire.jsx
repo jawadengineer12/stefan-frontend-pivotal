@@ -31,12 +31,13 @@ const Questionnaire = () => {
             questions: section.questions
               .map((q) => ({
                 ...q,
-                rating: 0, // start empty
-                feedback: "",
-                cantAnswer: false, 
+                rating: q.rating ?? 0,                 // use DB rating if present
+                feedback: q.answer || "",              // use DB answer if present
+                cantAnswer: q.rating === 0 && !q.answer, // mark skipped
                 rating_3_text: q.rating_3_text || "",
                 rating_neg3_text: q.rating_neg3_text || "",
               }))
+
               .sort((a, b) => {
                 const numA = parseInt(a.question.match(/\d+/)?.[0] || 0);
                 const numB = parseInt(b.question.match(/\d+/)?.[0] || 0);
@@ -46,9 +47,8 @@ const Questionnaire = () => {
 
         // Check localStorage for saved answers
         const savedData = localStorage.getItem("questionnaire_answers");
-        if (savedData) {
-          const parsed = JSON.parse(savedData);
-          setSections(parsed);
+        if (savedData && !submitted) {
+          setSections(JSON.parse(savedData));
         } else {
           setSections(merged);
         }
