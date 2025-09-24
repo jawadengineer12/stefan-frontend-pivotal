@@ -77,6 +77,26 @@ const Questionnaire = () => {
     saveSingleAnswer(question);
   };
 
+    const saveSingleAnswer = async (question) => {
+    try {
+      await axios.post(
+        `${API_BASE_URL}/user/submit-answer/`,
+        [
+          {
+            question_id: question.question_id,
+            answer: question.cantAnswer ? "" : question.feedback,
+            rating: question.cantAnswer ? 0 : question.rating,
+            submitted_at: new Date().toISOString(),
+          },
+        ],
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+    } catch (err) {
+      console.error("Failed to save single answer:", err);
+    }
+  };
   const handleFeedbackChange = (sIndex, qIndex, value) => {
     const updated = [...sections];
     const question = updated[sIndex].questions[qIndex];
@@ -132,9 +152,6 @@ const Questionnaire = () => {
       });
 
       setSubmitted(true);
-
-      // 🔹 Clear localStorage after successful submit
-      
 
       const companyId = localStorage.getItem("company_id");
       if (companyId) {
@@ -225,8 +242,8 @@ const Questionnaire = () => {
         </div>
 
         <p className="text-gray-600 text-center mb-8">
-          Your ratings and answers are saved step by step locally. You can
-          always return to the answers and adjust them later.
+           Your ratings and answers are saved step by step locally. You can
+           always return to the answers and adjust them later.
         </p>
 
         {submitted && (
@@ -395,4 +412,3 @@ const Questionnaire = () => {
 };
 
 export default Questionnaire;
-//questions
