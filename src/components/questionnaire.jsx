@@ -242,8 +242,7 @@ const Questionnaire = () => {
         </div>
 
         <p className="text-gray-600 text-center mb-8">
-           Your ratings and answers are saved step by step locally. You can
-           always return to the answers and adjust them later.
+           Your ratings and answers are saved securely. Feel free to come back anytime to review or update them.
         </p>
 
         {submitted && (
@@ -268,7 +267,7 @@ const Questionnaire = () => {
               style={{
                 backgroundColor: isSectionComplete(section)
                   ? "#548B51"
-                  : "#D1D5DB", // green if complete else grey
+                  : "#D1D5DB", 
               }}
               onClick={() =>
                 setExpandedSection(
