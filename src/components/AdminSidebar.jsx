@@ -72,6 +72,13 @@ const AdminSidebar = ({ sidebarVisible, setSidebarVisible }) => {
               >
                 Generate Pipo Report
               </button>
+
+              <button
+                onClick={() => handleNavClick("/admin/dashboard/users")}
+                className="font-['Readex_Pro'] text-left hover:bg-[#7292af] px-4 py-2 rounded cursor-pointer"
+              >
+                User Management
+              </button>
             </div>
             <button
               onClick={handleLogout}

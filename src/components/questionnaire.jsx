@@ -30,14 +30,35 @@ const Questionnaire = () => {
             ...section,
             questions: section.questions
               .map((q) => {
-               const isBlank = !q.answer || q.answer === "blank";
-                return {
+               // Check if question has any answer data from backend
+               const hasBackendAnswer = q.answer !== null && q.answer !== undefined;
+               const hasBackendRating = q.rating !== null && q.rating !== undefined;
+               
+               const isBlank = !hasBackendAnswer || q.answer === "blank" || (typeof q.answer === "string" && q.answer.trim() === "");
+               
+               // Determine if "can't answer" was explicitly checked
+               // This is true only if: rating exists in backend, rating is 0, and answer is blank
+               // If rating is null/undefined from backend, the question was never answered
+               const cantAnswerChecked = hasBackendRating && q.rating === 0 && isBlank;
+               
+               // Safely get show_rating_scale - ensure it's always a boolean
+               // Default to true if undefined/null (backward compatibility)
+               let showRatingScale = true;
+               if (q.show_rating_scale !== undefined && q.show_rating_scale !== null) {
+                 showRatingScale = Boolean(q.show_rating_scale);
+               }
+               
+               // For display, default rating to 0 if null/undefined (for slider UI)
+               // But we track if it came from backend to know if question was ever answered
+               return {
                   ...q,
-                  rating: q.rating ?? 0,
+                  rating: hasBackendRating ? q.rating : 0, // Default to 0 for slider UI
                   feedback: isBlank ? "" : q.answer,
-                  cantAnswer: q.rating === 0 && isBlank,
+                  cantAnswer: cantAnswerChecked,
                   rating_3_text: q.rating_3_text || "",
                   rating_neg3_text: q.rating_neg3_text || "",
+                  show_rating_scale: showRatingScale, // Always a boolean
+                  _wasAnswered: hasBackendRating || hasBackendAnswer, // Track if question was ever answered
                 };
               })
 
@@ -63,9 +84,34 @@ const Questionnaire = () => {
   }, [token, navigate]);
 
   const isSectionComplete = (section) => {
-    return section.questions.every(
-      (q) => q.cantAnswer || q.rating !== 0 || q.feedback.trim() !== ""
-    );
+    // A section is complete only if ALL questions are answered
+    return section.questions.every((q) => {
+      // If question was never answered (no data from backend), it's incomplete
+      if (!q._wasAnswered) {
+        return false;
+      }
+      
+      // Question is answered if:
+      // 1. User explicitly marked "can't answer" (cantAnswer is true), OR
+      // 2. For questions with rating scale: User provided a non-zero rating AND feedback text
+      // 3. For questions without rating scale: User provided feedback text
+      
+      if (q.cantAnswer) {
+        return true; // User explicitly marked as "can't answer"
+      }
+      
+      const hasFeedback = q.feedback && q.feedback.trim() !== "";
+      
+      // If question doesn't show rating scale, only feedback is needed
+      // show_rating_scale is always a boolean (set during mapping)
+      if (q.show_rating_scale === false) {
+        return hasFeedback;
+      }
+      
+      // For questions with rating scale, need both non-zero rating AND feedback
+      const hasNonZeroRating = q.rating !== 0 && q.rating !== null && q.rating !== undefined;
+      return hasNonZeroRating && hasFeedback;
+    });
   };
 
   const handleRatingChange = (sIndex, qIndex, value) => {
@@ -79,13 +125,19 @@ const Questionnaire = () => {
 
     const saveSingleAnswer = async (question) => {
     try {
+      // For questions without rating scale, don't send rating
+      // show_rating_scale is always a boolean (set during mapping)
+      const rating = question.show_rating_scale !== false
+        ? (question.cantAnswer ? 0 : question.rating)
+        : null;
+      
       await axios.post(
         `${API_BASE_URL}/user/submit-answer/`,
         [
           {
             question_id: question.question_id,
             answer: question.cantAnswer ? "" : question.feedback,
-            rating: question.cantAnswer ? 0 : question.rating,
+            rating: rating,
             submitted_at: new Date().toISOString(),
           },
         ],
@@ -136,12 +188,17 @@ const Questionnaire = () => {
 
     try {
       const allAnswers = sections.flatMap((section) =>
-        section.questions.map((q) => ({
-          question_id: q.question_id,
-          answer: q.cantAnswer ? "" : q.feedback,
-          rating: q.cantAnswer ? 0 : q.rating,
-          submitted_at: new Date().toISOString(),
-        }))
+        section.questions.map((q) => {
+          // show_rating_scale is always a boolean (set during mapping)
+          return {
+            question_id: q.question_id,
+            answer: q.cantAnswer ? "" : q.feedback,
+            rating: q.show_rating_scale !== false
+              ? (q.cantAnswer ? 0 : q.rating)
+              : null, // For questions without rating scale, don't send rating
+            submitted_at: new Date().toISOString(),
+          };
+        })
       );
 
       await axios.post(`${API_BASE_URL}/user/submit-answer/`, allAnswers, {
@@ -309,25 +366,28 @@ const Questionnaire = () => {
                         {question.question}
                       </p>
 
-                      <div className="mb-4">
-                        <label className="text-sm text-gray-800 flex items-center gap-2 mb-2 cursor-pointer">
-                          <div className="relative">
-                            <input
-                              type="checkbox"
-                              checked={question.cantAnswer}
-                              onChange={() =>
-                                handleCantAnswerToggle(sIndex, qIndex)
-                              }
-                              className="peer appearance-none h-4 w-4 border border-gray-400 rounded bg-transparent cursor-pointer checked:bg-transparent"
-                            />
-                            <span className="absolute top-0 left-0 h-4 w-4 flex items-center justify-center text-xs font-bold text-black peer-checked:opacity-100 opacity-0 pointer-events-none">
-                              ✔
-                            </span>
-                          </div>
-                          I can’t answer this question
-                        </label>
-                      </div>
+                      {question.show_rating_scale && (
+                        <div className="mb-4">
+                          <label className="text-sm text-gray-800 flex items-center gap-2 mb-2 cursor-pointer">
+                            <div className="relative">
+                              <input
+                                type="checkbox"
+                                checked={question.cantAnswer}
+                                onChange={() =>
+                                  handleCantAnswerToggle(sIndex, qIndex)
+                                }
+                                className="peer appearance-none h-4 w-4 border border-gray-400 rounded bg-transparent cursor-pointer checked:bg-transparent"
+                              />
+                              <span className="absolute top-0 left-0 h-4 w-4 flex items-center justify-center text-xs font-bold text-black peer-checked:opacity-100 opacity-0 pointer-events-none">
+                                ✔
+                              </span>
+                            </div>
+                            I can't answer this question
+                          </label>
+                        </div>
+                      )}
 
+                      {question.show_rating_scale && (
                       <div className="mb-6">
                         <input
                           type="range"
@@ -367,11 +427,12 @@ const Questionnaire = () => {
                           </span>
                         </div>
                       </div>
+                      )}
 
                       <textarea
-                        placeholder="Please explain your rating..."
+                        placeholder={question.show_rating_scale ? "Please explain your rating..." : "Please provide your answer..."}
                         value={question.feedback}
-                        disabled={question.cantAnswer}
+                        disabled={question.show_rating_scale && question.cantAnswer}
                         onChange={(e) =>
                           handleFeedbackChange(sIndex, qIndex, e.target.value)
                         }

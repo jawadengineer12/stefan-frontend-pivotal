@@ -23,6 +23,7 @@ import GetQuestions from "./pages/admin/adminscreens/GetQuestions";
 import GenerateReport from "./pages/admin/adminscreens/GenerateReport";
 import GenerateFeedback from "./pages/admin/adminscreens/GenerateFeedback";
 import CompanyManagement from "./pages/admin/adminscreens/companymanagement";
+import UserManagement from "./pages/admin/adminscreens/UserManagement";
 
 const App = () => {
   return (
@@ -64,6 +65,7 @@ const App = () => {
          <Route path="company" element={<CompanyManagement />} />
           <Route path="generate-report" element={<GenerateReport />} />
           <Route path="feedback" element={<GenerateFeedback />} />
+          <Route path="users" element={<UserManagement />} />
         </Route>
       </Routes>
     </Router>

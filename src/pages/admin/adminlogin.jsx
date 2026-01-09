@@ -15,26 +15,44 @@ export default function AdminLogin() {
   const navigate = useNavigate();
 
   const handleAdminLogin = async () => {
+    // Validate inputs
+    if (!email.trim()) {
+      setError("Email is required");
+      return;
+    }
+    if (!password.trim()) {
+      setError("Password is required");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/admin/login/`, {
-        email,
-        password,
-      });
-      if (response.status !== 200) {
-        throw new Error("Login failed");
-      }
-      else{
+      const response = await axios.post(
+        `${API_BASE_URL}/admin/login/`,
+        {
+          email: email.trim(),
+          password: password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      if (response.status === 200) {
         navigate("/admin/dashboard");
       }
-      // Redirect on success
-      navigate("/admin/dashboard");
     } 
     catch (err) {
+      console.error("Admin login error:", err);
       const message =
-        err.response?.data?.detail || "Login failed. Please try again.";
+        err.response?.data?.detail || 
+        err.response?.data?.message ||
+        err.message ||
+        "Login failed. Please try again.";
       setError(message);
     } finally {
       setLoading(false);

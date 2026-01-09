@@ -10,6 +10,9 @@ const CreateQuestion = () => {
   const [newQuestion, setNewQuestion] = useState("");
   const [newQuestionTextPositive, setNewQuestionTextPositive] = useState("");
   const [newQuestionTextNegative, setNewQuestionTextNegative] = useState("");
+  const [showRatingScale, setShowRatingScale] = useState(true);
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState(null);
   const [editTitleId, setEditTitleId] = useState(null);
   const [editQuestionId, setEditQuestionId] = useState(null);
   const [editedTitle, setEditedTitle] = useState("");
@@ -22,13 +25,37 @@ const CreateQuestion = () => {
 
   useEffect(() => {
     fetchSections();
+    fetchCompanies();
   }, []);
+
+  const fetchCompanies = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/admin/get-companies`);
+      setCompanies(res.data);
+      // Auto-select first company if available, or leave null for global sections
+      if (res.data.length > 0) {
+        setSelectedCompanyId(res.data[0].id);
+      }
+    } catch (err) {
+      console.error("Error fetching companies:", err);
+    }
+  };
 
   const fetchSections = async () => {
     setLoading(true);
     try {
       const res = await axios.get(`${API_BASE_URL}/admin/get-all-questions/`);
-      setSections(res.data);
+      // Normalize show_rating_scale to always be a boolean
+      const normalizedSections = res.data.map(section => ({
+        ...section,
+        questions: section.questions.map(q => ({
+          ...q,
+          show_rating_scale: q.show_rating_scale !== undefined && q.show_rating_scale !== null 
+            ? Boolean(q.show_rating_scale) 
+            : true // Default to true for backward compatibility
+        }))
+      }));
+      setSections(normalizedSections);
     } catch (err) {
       console.error("Error fetching questions:", err);
     }
@@ -51,16 +78,19 @@ const CreateQuestion = () => {
       const label = labelMatch[1];
       const title = labelMatch[2];
 
-      await axios.post(`${API_BASE_URL}/admin/create-section/`, {
+      const response = await axios.post(`${API_BASE_URL}/admin/create-section/`, {
         label: label,
         title: title,
-        company_id: 1,
+        company_id: selectedCompanyId, // Use selected company or null for global sections
       });
 
       setNewSectionTitle("");
       await fetchSections();
+      alert("Section created successfully!");
     } catch (err) {
       console.error("Error adding section:", err);
+      const errorMessage = err.response?.data?.detail || err.message || "Failed to create section. Please check if backend is running.";
+      alert(`Error: ${errorMessage}\n\nMake sure:\n1. Backend server is running\n2. Company exists (if selected)\n3. API URL is correct: ${API_BASE_URL}`);
     }
     setAddingSection(false);
   };
@@ -74,10 +104,12 @@ const CreateQuestion = () => {
         question: newQuestion,
         positive_rating_text: newQuestionTextPositive,
         negative_rating_text: newQuestionTextNegative,
+        show_rating_scale: showRatingScale,
       });
       setNewQuestion("");
       setNewQuestionTextPositive("");
       setNewQuestionTextNegative("");
+      setShowRatingScale(true);
       await fetchSections();
     } catch (err) {
       console.error("Error adding question:", err);
@@ -108,6 +140,12 @@ const CreateQuestion = () => {
       question.editingRatingPosText ?? question.rating_3_text;
     const negativeText =
       question.editingRatingNegText ?? question.rating_neg3_text;
+    // Normalize show_rating_scale - always ensure it's a boolean
+    const showRatingScale = question.editingShowRatingScale !== undefined 
+      ? Boolean(question.editingShowRatingScale)
+      : (question.show_rating_scale !== undefined && question.show_rating_scale !== null
+          ? Boolean(question.show_rating_scale)
+          : true);
     if (!editedQuestionText.trim()) return;
     setSavingQuestionId(question.question_id);
     try {
@@ -118,6 +156,7 @@ const CreateQuestion = () => {
           section_id: sectionId,
           positive_rating_text: positiveText,
           negative_rating_text: negativeText,
+          show_rating_scale: showRatingScale,
         }
       );
       setEditQuestionId(null);
@@ -158,6 +197,21 @@ const CreateQuestion = () => {
       >
         Add Section
       </h2>
+      <div className="mb-2">
+        <label className="text-sm text-gray-700 mb-1 block">Company (Optional - leave empty for global section)</label>
+        <select
+          value={selectedCompanyId || ""}
+          onChange={(e) => setSelectedCompanyId(e.target.value ? parseInt(e.target.value) : null)}
+          className="border p-2 w-full rounded bg-green-50 cursor-pointer"
+        >
+          <option value="">-- Global Section (All Companies) --</option>
+          {companies.map((company) => (
+            <option key={company.id} value={company.id}>
+              {company.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <input
         placeholder="e.g A. ARTIFICIAL INTELLIGENCE"
         value={newSectionTitle}
@@ -335,6 +389,29 @@ const CreateQuestion = () => {
                           setSections(updated);
                         }}
                       />
+                      <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={q.editingShowRatingScale !== undefined 
+                            ? Boolean(q.editingShowRatingScale)
+                            : (q.show_rating_scale !== undefined && q.show_rating_scale !== null
+                                ? Boolean(q.show_rating_scale)
+                                : true)}
+                          onChange={(e) => {
+                            const updated = [...sections];
+                            const sec = updated.find(
+                              (s) => s.section_id === section.section_id
+                            );
+                            const ques = sec.questions.find(
+                              (qq) => qq.question_id === q.question_id
+                            );
+                            ques.editingShowRatingScale = e.target.checked;
+                            setSections(updated);
+                          }}
+                          className="w-4 h-4 cursor-pointer"
+                        />
+                        <span className="text-sm">Show rating scale (-3 to +3)</span>
+                      </label>
                       <button
                         onClick={() =>
                           handleEditQuestionSave(q, section.section_id)
@@ -355,12 +432,21 @@ const CreateQuestion = () => {
                           </strong>{" "}
                           {q.question.replace(/^(A\d+\.)/, "").trim()}
                         </p>
-                        <p className="text-[#548B51] text-sm">
-                          +3: {q.rating_3_text}
-                        </p>
-                        <p className="text-red-600 text-sm">
-                          -3: {q.rating_neg3_text}
-                        </p>
+                        {q.show_rating_scale && (
+                          <>
+                            <p className="text-[#548B51] text-sm">
+                              +3: {q.rating_3_text}
+                            </p>
+                            <p className="text-red-600 text-sm">
+                              -3: {q.rating_neg3_text}
+                            </p>
+                          </>
+                        )}
+                        {!q.show_rating_scale && (
+                          <p className="text-gray-500 text-sm italic">
+                            Text-only question (no rating scale)
+                          </p>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         <button

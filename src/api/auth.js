@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://stephn-backend-jaffars-projects-118ed8de.vercel.app';
+import API_BASE_URL from '../constants/config';
 
 
 export const signup = (data) =>

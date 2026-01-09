@@ -39,10 +39,19 @@ export default function SignUp() {
   const fetchCompanies = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE_URL}/user/get-companies`);
-      setCompanies(res.data);
+      // Add timestamp to prevent caching
+      const res = await axios.get(`${API_BASE_URL}/user/get-companies`, {
+        params: { _t: Date.now() }
+      });
+      // Sort companies alphabetically for better UX
+      const sortedCompanies = res.data.sort((a, b) => 
+        a.name.localeCompare(b.name)
+      );
+      setCompanies(sortedCompanies);
+      console.log("Fetched companies:", sortedCompanies.length, "companies");
     } catch (err) {
       console.error("Error fetching companies:", err);
+      alert("Failed to load companies. Please refresh the page.");
     }
     setLoading(false);
   };
@@ -84,10 +93,15 @@ export default function SignUp() {
 
   const handleCompanyInput = (value) => {
     setCompanyName(value);
+    if (value.trim() === "") {
+      setCompanySuggestions([]);
+      return;
+    }
     const matches = companies.filter((c) =>
       c.name.toLowerCase().includes(value.toLowerCase())
     );
-    setCompanySuggestions(matches.slice(0, 10));
+    // Show all matches, not just 10, so users can see all companies
+    setCompanySuggestions(matches);
   };
 
   if (loading) {
